@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Threading;
 
-namespace WpfApp1
+namespace MusicPlayer2
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -24,10 +24,9 @@ namespace WpfApp1
 
         private void IsPlaying(bool value)
         {
-            btnStop.IsEnabled = value;
+            //btnPauseContinue.IsEnabled = value;
             btnBack.IsEnabled = value;
             btnForward.IsEnabled = value;
-            btnPlay.IsEnabled = value;
         }
 
         private TimeSpan totalTime;
@@ -35,6 +34,7 @@ namespace WpfApp1
         private void btnPlay_Click(object sender, RoutedEventArgs e)
         {
             PlayFromList();
+            IsPlaying(true);
         }
     private void timer_Tick(object sender, EventArgs e)
     {
@@ -50,12 +50,21 @@ namespace WpfApp1
         }
     }
 
-    private void btnStop_Click(object sender, RoutedEventArgs e)
+    private void btnPauseContinue_Click(object sender, RoutedEventArgs e)
         {
-            mediaElement.Stop();
-            btnPlay.Content = "Play";
-            IsPlaying(false);
-            btnPlay.IsEnabled = true;
+            if (btnPauseContinue.Content.ToString() == "Pause")
+            {
+                mediaElement.Pause();
+                btnPauseContinue.Content = "Continue";
+                IsPlaying(false);
+            }
+            else
+            {
+                mediaElement.Play();
+                btnPauseContinue.Content = "Pause";
+                IsPlaying(true);
+            }
+
         }
 
         private void btnBack_Click(object sender, RoutedEventArgs e)
@@ -74,9 +83,6 @@ namespace WpfApp1
             if (fd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 playListFileStorage.GetMusicRecursive(fd.SelectedPath);
-                //System.Windows.MessageBox.Show(fd.SelectedPath);
-                //mediaElement.Source = new Uri(fd.FileName);
-                //btnPlay.IsEnabled = true;
             }
             LoadMusicList();
             playListFileStorage.Save();
@@ -166,6 +172,11 @@ namespace WpfApp1
             if (listMusics.SelectedIndex < listMusics.Items.Count -1)
             {
                 listMusics.SelectedIndex++;
+                PlayFromList();
+            }
+            else 
+            {
+                listMusics.SelectedIndex = 0;
                 PlayFromList();
             }
         }
