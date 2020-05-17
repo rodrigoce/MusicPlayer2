@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Threading;
 
@@ -20,37 +17,50 @@ namespace MusicPlayer2
             IsPlaying(false);
         }
 
-        private PlayListFileStorage playListFileStorage = new PlayListFileStorage();
+        private PlayList playList;
 
         private void IsPlaying(bool value)
         {
-            //btnPauseContinue.IsEnabled = value;
-            btnBack.IsEnabled = value;
-            btnForward.IsEnabled = value;
+            if (value) btnPauseContinue.Content = "Pause";
+            btnRunBack.IsEnabled = value;
+            btnRunForward.IsEnabled = value;
         }
 
-        private TimeSpan totalTime;
-        private DispatcherTimer timerVideoTime;
         private void btnPlay_Click(object sender, RoutedEventArgs e)
         {
-            PlayFromList();
-            IsPlaying(true);
+            playList.SetCurrentMusic(listBoxMusics.SelectedItem);
+            PlayNew();
         }
-    private void timer_Tick(object sender, EventArgs e)
-    {
-        
-        // Check if the movie finished calculate it's total time
-        if ((mediaElement.NaturalDuration.HasTimeSpan) && (mediaElement.NaturalDuration.TimeSpan.TotalSeconds > 0))
+
+        #region timmer
+
+        private DispatcherTimer timerMoveSlider;
+
+        private void timer_Tick(object sender, EventArgs e)
         {
-            if (totalTime.TotalSeconds > 0)
+            if (mediaElement.NaturalDuration.HasTimeSpan && (mediaElement.NaturalDuration.TimeSpan.TotalSeconds > 0))
             {
-                // Updating time slider
-                timerSlider.Value = mediaElement.Position.TotalSeconds ;
+                currentSecond.Text = mediaElement.Position.TotalSeconds.ToString("#s");
+                totalSeconds.Text = mediaElement.NaturalDuration.TimeSpan.TotalSeconds.ToString("#s");
+                if ((int)(timerMoveSlider.Tag ?? 1) == 1)
+                    sliderPositionOfMusic.Value = mediaElement.Position.TotalSeconds;
             }
         }
-    }
 
-    private void btnPauseContinue_Click(object sender, RoutedEventArgs e)
+        private void sliderPositionOfMusic_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            timerMoveSlider.Tag = 0;
+        }
+
+        private void sliderPositionOfMusic_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            mediaElement.Position = TimeSpan.FromSeconds(sliderPositionOfMusic.Value);
+            timerMoveSlider.Tag = 1;
+        }
+
+        #endregion
+
+        private void btnPauseContinue_Click(object sender, RoutedEventArgs e)
         {
             if (btnPauseContinue.Content.ToString() == "Pause")
             {
@@ -64,36 +74,21 @@ namespace MusicPlayer2
                 btnPauseContinue.Content = "Pause";
                 IsPlaying(true);
             }
-
         }
 
-        private void btnBack_Click(object sender, RoutedEventArgs e)
+        private void btnRunBack_Click(object sender, RoutedEventArgs e)
         {
             mediaElement.Position = mediaElement.Position - TimeSpan.FromSeconds(5);
         }
 
-        private void btnForward_Click(object sender, RoutedEventArgs e)
+        private void btnRunForward_Click(object sender, RoutedEventArgs e)
         {
             mediaElement.Position = mediaElement.Position + TimeSpan.FromSeconds(5);
         }
 
         private void btnAddFolder_Click(object sender, RoutedEventArgs e)
         {
-            var fd = new FolderBrowserDialog();
-            if (fd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                playListFileStorage.GetMusicRecursive(fd.SelectedPath);
-            }
-            LoadMusicList();
-            playListFileStorage.Save();
-        }
-
-        private void LoadMusicList()
-        {
-            foreach (var music in playListFileStorage.PlayList)
-            {
-                listMusics.Items.Add(music.Nro + " - " + music.Name);
-            }
+            playList.AddFolder();    
         }
 
         private void Mute_Click(object sender, RoutedEventArgs e)
@@ -116,96 +111,88 @@ namespace MusicPlayer2
             mediaElement.SpeedRatio = SpeedSlider.Value;
         }
 
+        #region media
+
         private void mediaElement_MediaOpened(object sender, RoutedEventArgs e)
         {
-            totalTime = mediaElement.NaturalDuration.TimeSpan;
-            timerSlider.Minimum = 0;
-            timerSlider.Maximum = mediaElement.NaturalDuration.TimeSpan.TotalSeconds;
-            // Create a timer that will update the counters and the time slider
-            timerVideoTime = new DispatcherTimer();
-            timerVideoTime.Interval = TimeSpan.FromSeconds(1);
-            timerVideoTime.Tick += new EventHandler(timer_Tick);
-            timerVideoTime.Start();
-            ShowMediaInformation();
-        }
-        private void ShowMediaInformation()
-        {
-            var duration = mediaElement.NaturalDuration.HasTimeSpan
-                ? mediaElement.NaturalDuration.TimeSpan.TotalSeconds.ToString("#s")
-                : "No duration";
-            MediaInformation.Text = duration;
+            sliderPositionOfMusic.Minimum = 0;
+            sliderPositionOfMusic.Maximum = mediaElement.NaturalDuration.TimeSpan.TotalSeconds;
+            timerMoveSlider.Start();
         }
 
-        private void timerSlider_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        private void mediaElement_MediaEnded(object sender, RoutedEventArgs e)
         {
-            if (totalTime.TotalSeconds > 0)
-            {
-                mediaElement.Position = TimeSpan.FromSeconds(timerSlider.Value);
-            }
+            timerMoveSlider.Stop();
+            MoveNext();
         }
+
+        private void mediaElement_MediaFailed(object sender, ExceptionRoutedEventArgs e)
+        {
+            timerMoveSlider.Stop();
+            MoveNext();
+        }
+
+        #endregion
+
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            playListFileStorage.Load();
-            LoadMusicList();
+            playList = new PlayList(mediaElement, listBoxMusics);
+            playList.LoadListFromStorage();
+            timerMoveSlider = new DispatcherTimer();
+            timerMoveSlider.Interval = TimeSpan.FromSeconds(1);
+            timerMoveSlider.Tick += new EventHandler(timer_Tick);
         }
 
         private void listMusics_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left)
             {
-                PlayFromList();
-            }
-        }
-
-        private void PlayFromList()
-        {
-            if (listMusics.SelectedIndex >= 0)
-            {
-                var music = playListFileStorage.PlayList.Single(c => c.Nro == listMusics.SelectedIndex + 1);
-                PlayNew(music);
+                playList.SetCurrentMusic(listBoxMusics.SelectedItem);
+                PlayNew();
             }
         }
 
         private void MoveNext()
         {
-            if (listMusics.SelectedIndex < listMusics.Items.Count -1)
-            {
-                listMusics.SelectedIndex++;
-                PlayFromList();
-            }
-            else 
-            {
-                listMusics.SelectedIndex = 0;
-                PlayFromList();
-            }
+            playList.MoveToNextMusic();
+            PlayNew();
         }
 
-        private void PlayNew(Music file)
+        private void PlayNew()
         {
-            mediaElement.Source = new Uri(file.Path);
-            mediaElement.LoadedBehavior = MediaState.Manual;
-            mediaElement.UnloadedBehavior = MediaState.Manual;
-            mediaElement.Play();
-            textMusicName.Text = file.Name;
+            var music = playList.GetCurrrentMusic();
+            if (music != null)
+            {
+                mediaElement.Source = new Uri(music.Path);
+                mediaElement.LoadedBehavior = MediaState.Manual;
+                mediaElement.UnloadedBehavior = MediaState.Manual;
+                mediaElement.Play();
+                listBoxMusics.SelectedIndex = listBoxMusics.Items.IndexOf(music.ItemOnListBox);
+                IsPlaying(true);
+                textMusicName.Text = music.Name;
+            }
         }
 
         private void listMusics_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {
-                PlayFromList();
+                playList.SetCurrentMusic(listBoxMusics.SelectedItem);
+                PlayNew();
             }
         }
 
-        private void mediaElement_MediaEnded(object sender, RoutedEventArgs e)
+        private void LimparLista_Click(object sender, RoutedEventArgs e)
         {
-            MoveNext();
+            playList.ClearPlayList();
         }
 
-        private void mediaElement_MediaFailed(object sender, ExceptionRoutedEventArgs e)
+        private void btnAddFiles_Click(object sender, RoutedEventArgs e)
         {
-            MoveNext();
+
         }
+
+        
     }
 }

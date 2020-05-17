@@ -7,19 +7,9 @@ using System.Threading.Tasks;
 
 namespace MusicPlayer2
 {
-    public class Music
-    {
-        public int Nro { get; set; }
-        public string Path { get; set; }
-        public string Name { get; set; }
-        public string NameForSearch { get; set; }
-    }
     public class PlayListFileStorage
     {
-        private const char RECORD_SEPARATOR = (char)30;
-
-        private const string STORE_FILENAME = "PlayList.txt";
-
+ 
         public List<Music> PlayList = new List<Music>();
 
         public void GetMusicRecursive(string rootFolder)
@@ -46,8 +36,8 @@ namespace MusicPlayer2
             var sl = new List<string>();
             foreach (var item in PlayList)
             {
-                sl.Add(item.Name + RECORD_SEPARATOR +
-                    item.NameForSearch + RECORD_SEPARATOR +
+                sl.Add(item.Name + Constantes.RECORD_SEPARATOR +
+                    item.NameForSearch + Constantes.RECORD_SEPARATOR +
                     item.Path);
             } 
 
@@ -56,7 +46,7 @@ namespace MusicPlayer2
 
         public void Save()
         {
-            File.WriteAllLines(Path.GetTempPath() + STORE_FILENAME, ListToLines());
+            File.WriteAllLines(Path.GetTempPath() + Constantes.STORE_FILENAME, ListToLines());
         }
 
         public void Load()
@@ -67,7 +57,7 @@ namespace MusicPlayer2
 
             try
             {
-                f = File.ReadAllLines(Path.GetTempPath() + STORE_FILENAME);
+                f = File.ReadAllLines(Path.GetTempPath() + Constantes.STORE_FILENAME);
             }
             catch 
             {
@@ -78,7 +68,7 @@ namespace MusicPlayer2
             {
                 foreach (var item in f)
                 {
-                    var separated = item.Split(RECORD_SEPARATOR);
+                    var separated = item.Split(Constantes.RECORD_SEPARATOR);
                     PlayList.Add(new Music()
                     {
                         Nro = PlayList.Count + 1,
@@ -88,6 +78,11 @@ namespace MusicPlayer2
                     });
                 }
             }
+        }
+
+        public void Clear()
+        {
+            PlayList.Clear();
         }
     }
 }

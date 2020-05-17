@@ -17,39 +17,85 @@
         </Grid.RowDefinitions>
         
         <!-- Line 0 -->
+        <Rectangle Fill="Blue" />
         <MediaElement x:Name="mediaElement" IsManipulationEnabled="True" MediaOpened="mediaElement_MediaOpened" ForceCursor="True" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="60" Height="30" MediaEnded="mediaElement_MediaEnded" MediaFailed="mediaElement_MediaFailed" />
-        <TextBlock x:Name="textMusicName" HorizontalAlignment="Center" TextWrapping="Wrap" Text="Nenhuma Música Tocando" VerticalAlignment="Center"/>
+        <TextBlock x:Name="textMusicName" HorizontalAlignment="Center" TextWrapping="Wrap" Text="I'm waiting for you to press play!!!" VerticalAlignment="Center" FontSize="16" Foreground="White" FontWeight="Bold" />
+        
 
         <!-- Line 1 -->
-        <Slider x:Name="timerSlider" Value="0" VerticalAlignment="Center" Grid.Row="1" PreviewMouseLeftButtonUp="timerSlider_PreviewMouseLeftButtonUp" />
+        <Slider x:Name="sliderPositionOfMusic" Value="0" VerticalAlignment="Center" Grid.Row="1" PreviewMouseLeftButtonUp="sliderPositionOfMusic_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="sliderPositionOfMusic_PreviewMouseLeftButtonDown">
+        </Slider>
 
         <!-- Line 2 -->
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="2">
-            <ToggleButton x:Name="Mute" Height="30" VerticalAlignment="Top" Click="Mute_Click">Mute</ToggleButton>
+            <StackPanel.Resources>
+                <Style TargetType="ToggleButton">
+                    <Setter Property="Margin" Value="5"/>
+                    <Setter Property="Background">
+                        <Setter.Value>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="#FFE5FDDE" Offset="0"/>
+                                <GradientStop Color="#FF46C764" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="Width" Value="50"/>
+                </Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="FontSize" Value="12"/>
+                </Style>
+                <Style TargetType="Slider">
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="Margin" Value="0,0,5,0"/>
+                </Style>
+            </StackPanel.Resources>
+            
+            <TextBlock x:Name="currentSecond" Text="*" Width="70" TextAlignment="Right"/>
+            
+            <ToggleButton x:Name="Mute" Click="Mute_Click">Mute</ToggleButton>
 
-            <TextBlock FontSize="10" VerticalAlignment="Center">Volume</TextBlock>
-            <Slider x:Name="VolumeSlider" Value="0.75" Maximum="1" Width="100" VerticalAlignment="Center" ValueChanged="VolumeSlider_ValueChanged" />
+            <TextBlock>Volume</TextBlock>
+            <Slider x:Name="VolumeSlider" Value="1" Maximum="1" Width="100" ValueChanged="VolumeSlider_ValueChanged" />
 
-            <TextBlock FontSize="10" VerticalAlignment="Center">Balance</TextBlock>
-            <Slider x:Name="BalanceSlider" Value="0" Minimum="-1" Maximum="1" Width="100" VerticalAlignment="Center" ValueChanged="BalanceSlider_ValueChanged"/>
+            <TextBlock>Balance</TextBlock>
+            <Slider x:Name="BalanceSlider" Value="0" Minimum="-1" Maximum="1" Width="100" ValueChanged="BalanceSlider_ValueChanged"/>
 
-            <TextBlock FontSize="10" VerticalAlignment="Center">Speed</TextBlock>
-            <Slider x:Name="SpeedSlider" Value="1" Minimum="0" Maximum="4" TickPlacement="Both" IsSnapToTickEnabled="True" Width="100" VerticalAlignment="Center" ValueChanged="SpeedSlider_ValueChanged">
+            <TextBlock>Speed</TextBlock>
+            <Slider x:Name="SpeedSlider" Value="1" Minimum="0" Maximum="4" TickPlacement="Both" IsSnapToTickEnabled="True" Width="100" ValueChanged="SpeedSlider_ValueChanged">
                 <Slider.Ticks>
                     0, 0.25, 0.5, 1, 2, 4
                 </Slider.Ticks>
             </Slider>
-            <TextBlock x:Name="MediaInformation" VerticalAlignment="Center"/>
+            <TextBlock x:Name="totalSeconds" Text="*" Width="70"/>
         </StackPanel>
         
         
         <!-- Line 3 -->
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="3">
-            <Button x:Name="btnPlay" Content="Play" Width="75" Click="btnPlay_Click"/>
-            <Button x:Name="btnPauseContinue" Content="Pause"  Width="75" Click="btnPauseContinue_Click"/>
-            <Button x:Name="btnBack" Content="Back"  Width="75" Height="30" VerticalAlignment="Top" Click="btnBack_Click"/>
-            <Button x:Name="btnForward" Content="Forward"  Width="75" Click="btnForward_Click"/>
-            <Button x:Name="btnAddFolder" Content="Add Folder"  Width="75" Click="btnAddFolder_Click"/>
+            <StackPanel.Resources>
+                <Style TargetType="Button">
+                    <Setter Property="Margin" Value="5"/>
+                    <Setter Property="Background">
+                        <Setter.Value>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="#FFF8FDDE" Offset="0"/>
+                                <GradientStop Color="#FFCCF11B" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Width" Value="85"/>
+                </Style>
+            </StackPanel.Resources>
+            <Button x:Name="btnPlay" Content="Play" Click="btnPlay_Click" ToolTip="x"/>
+            <Button x:Name="btnPauseContinue" Content="Pause" Click="btnPauseContinue_Click" ToolTip="c"/>
+            <Button x:Name="btnRunBack" Content="Run Back" Click="btnRunBack_Click" ToolTip="s"/>
+            <Button x:Name="btnRunForward" Content="Run Forward" Click="btnRunForward_Click" ToolTip="d"/>
+            <Button x:Name="btnBack" Content="Previous" Click="btnRunBack_Click" ToolTip="z"/>
+            <Button x:Name="btnForward" Content="Next" Click="btnRunForward_Click" ToolTip="v"/>
+            <Button x:Name="btnAddFolder" Content="Add Folder" Click="btnAddFolder_Click" ToolTip="f"/>
+            <Button x:Name="btnAddFiles" Content="Add Files" Click="btnAddFiles_Click" ToolTip="a"/>
         </StackPanel>
         
         <!-- Line 4 -->
@@ -58,8 +104,14 @@
             <TextBox Width="200" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" />
         </StackPanel>
         <!-- Line 5 -->
-        <ListBox x:Name="listMusics" Margin="0" Grid.Row="5" PreviewMouseDoubleClick="listMusics_PreviewMouseDoubleClick" FontSize="14" PreviewKeyDown="listMusics_PreviewKeyDown"/>
+        <ListBox x:Name="listBoxMusics" Margin="0" Grid.Row="5" PreviewMouseDoubleClick="listMusics_PreviewMouseDoubleClick" FontSize="14" PreviewKeyDown="listMusics_PreviewKeyDown">
+            <ListBox.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Limpar Lista" Click="LimparLista_Click"></MenuItem>
+                </ContextMenu>
+            </ListBox.ContextMenu>
+        </ListBox>
 
-        
+
     </Grid>
 </Window>
