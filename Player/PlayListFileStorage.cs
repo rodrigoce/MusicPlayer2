@@ -14,20 +14,26 @@ namespace MusicPlayer2
 
         public void GetMusicRecursive(string rootFolder)
         {
-            var files = Directory.GetFiles(rootFolder); //await rootFolder.GetFilesAsync();
+            var files = Directory.GetFiles(rootFolder);
+
+            AddFiles(files);
+
+            var folders = Directory.GetDirectories(rootFolder); 
+
+            foreach (var folder in folders)
+            {
+                GetMusicRecursive(folder);
+            }
+        }
+
+        public void AddFiles(string [] files)
+        {
             foreach (var file in files)
             {
                 if (file.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase))
                 {
                     PlayList.Add(new Music() { Nro = PlayList.Count + 1, Name = Path.GetFileNameWithoutExtension(file), NameForSearch = Path.GetFileNameWithoutExtension(file).ForSearch(), Path = file });
                 }
-            }
-
-            var folders = Directory.GetDirectories(rootFolder); //await rootFolder.GetFoldersAsync();
-
-            foreach (var folder in folders)
-            {
-                GetMusicRecursive(folder);
             }
         }
 

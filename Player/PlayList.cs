@@ -22,21 +22,45 @@ namespace MusicPlayer2
         private readonly System.Windows.Controls.ListBox listBoxMusics;
         private Music currentMusic;
 
+        private int GetLastPlayListIndex()
+        {
+            int last = playListFileStorage.PlayList.Count;
+           
+            return last;
+        }
+        
         public void AddFolder()
         {
             var fd = new FolderBrowserDialog();
             if (fd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
+                int last = GetLastPlayListIndex();
+
                 playListFileStorage.GetMusicRecursive(fd.SelectedPath);
+                LoadToListBoxMusics(last);
+                playListFileStorage.Save();
             }
-            LoadToListBoxMusics();
-            playListFileStorage.Save();
+        }
+        public void AddFiles()
+        {
+            var od = new OpenFileDialog();
+            od.Filter = "MP3 files (*.MP3)|*.MP3";
+            od.Multiselect = true;
+
+            if (od.ShowDialog() == DialogResult.OK)
+            {
+                int last = GetLastPlayListIndex();
+                playListFileStorage.AddFiles(od.FileNames);
+                LoadToListBoxMusics(last);
+                playListFileStorage.Save();
+            }
         }
 
-        private void LoadToListBoxMusics()
+        private void LoadToListBoxMusics(int startFrom)
         {
-            foreach (var music in playListFileStorage.PlayList)
+            for (int i = startFrom; i < playListFileStorage.PlayList.Count; i++)
             {
+                var music = playListFileStorage.PlayList[i];
                 listBoxMusics.Items.Add(music.Nro + " - " + music.Name);
                 music.ItemOnListBox = listBoxMusics.Items[listBoxMusics.Items.Count - 1];
             }
@@ -52,12 +76,13 @@ namespace MusicPlayer2
         public void LoadListFromStorage()
         {
             playListFileStorage.Load();
-            LoadToListBoxMusics();
+            LoadToListBoxMusics(0);
         }
 
         public void SetCurrentMusic(object selectedItem)
         {
-            currentMusic = playListFileStorage.PlayList.Single(c => c.ItemOnListBox == selectedItem);
+            if (selectedItem != null)
+                currentMusic = playListFileStorage.PlayList.Single(c => c.ItemOnListBox == selectedItem);
         }
 
         public Music GetCurrrentMusic()
@@ -80,6 +105,26 @@ namespace MusicPlayer2
                     currentMusic = playListFileStorage.PlayList[0];
                 }
             }
+            else
+                currentMusic = null;
+        }
+        public void MoveToPreviousMusic()
+        {
+            if (playListFileStorage.PlayList.Count > 0)
+            {
+                var index = playListFileStorage.PlayList.IndexOf(currentMusic);
+
+                if (index == 0)
+                {
+                    currentMusic = playListFileStorage.PlayList[playListFileStorage.PlayList.Count - 1];
+                }
+                else
+                {
+                    currentMusic = playListFileStorage.PlayList[--index];
+                }
+            }
+            else
+                currentMusic = null;
         }
 
         public void ClearPlayList()
@@ -88,5 +133,6 @@ namespace MusicPlayer2
             playListFileStorage.Save();
             listBoxMusics.Items.Clear();
         }
+
     }
 }

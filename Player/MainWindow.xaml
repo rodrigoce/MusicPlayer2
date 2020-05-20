@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MusicPlayer2"
         mc:Ignorable="d"
-        Title="Music Player 2" Height="450" Width="800" Loaded="Window_Loaded">
+        Title="Music Player 2" Height="700" Width="800" Loaded="Window_Loaded">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"></RowDefinition>
@@ -14,17 +14,23 @@
             <RowDefinition Height="30"></RowDefinition>
             <RowDefinition Height="30"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="30"></RowDefinition>
         </Grid.RowDefinitions>
-        
+
+        <Grid.Resources>
+            <Style TargetType="Slider">
+                <Setter Property="Background" Value="Green"/>
+            </Style>
+        </Grid.Resources>
+
         <!-- Line 0 -->
         <Rectangle Fill="Blue" />
-        <MediaElement x:Name="mediaElement" IsManipulationEnabled="True" MediaOpened="mediaElement_MediaOpened" ForceCursor="True" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="60" Height="30" MediaEnded="mediaElement_MediaEnded" MediaFailed="mediaElement_MediaFailed" />
+        <MediaElement x:Name="mediaElement" IsManipulationEnabled="True" MediaOpened="MediaElement_MediaOpened" ForceCursor="True" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="60" Height="30" MediaEnded="MediaElement_MediaEnded" MediaFailed="MediaElement_MediaFailed" />
         <TextBlock x:Name="textMusicName" HorizontalAlignment="Center" TextWrapping="Wrap" Text="I'm waiting for you to press play!!!" VerticalAlignment="Center" FontSize="16" Foreground="White" FontWeight="Bold" />
-        
+
 
         <!-- Line 1 -->
-        <Slider x:Name="sliderPositionOfMusic" Value="0" VerticalAlignment="Center" Grid.Row="1" PreviewMouseLeftButtonUp="sliderPositionOfMusic_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="sliderPositionOfMusic_PreviewMouseLeftButtonDown">
-        </Slider>
+        <Slider x:Name="sliderPositionOfMusic" Value="0" VerticalAlignment="Center" Grid.Row="1" PreviewMouseLeftButtonUp="SliderPositionOfMusic_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="SliderPositionOfMusic_PreviewMouseLeftButtonDown"/>
 
         <!-- Line 2 -->
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="2">
@@ -51,9 +57,9 @@
                     <Setter Property="Margin" Value="0,0,5,0"/>
                 </Style>
             </StackPanel.Resources>
-            
+
             <TextBlock x:Name="currentSecond" Text="*" Width="70" TextAlignment="Right"/>
-            
+
             <ToggleButton x:Name="Mute" Click="Mute_Click">Mute</ToggleButton>
 
             <TextBlock>Volume</TextBlock>
@@ -70,8 +76,8 @@
             </Slider>
             <TextBlock x:Name="totalSeconds" Text="*" Width="70"/>
         </StackPanel>
-        
-        
+
+
         <!-- Line 3 -->
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="3">
             <StackPanel.Resources>
@@ -88,23 +94,24 @@
                     <Setter Property="Width" Value="85"/>
                 </Style>
             </StackPanel.Resources>
-            <Button x:Name="btnPlay" Content="Play" Click="btnPlay_Click" ToolTip="x"/>
-            <Button x:Name="btnPauseContinue" Content="Pause" Click="btnPauseContinue_Click" ToolTip="c"/>
-            <Button x:Name="btnRunBack" Content="Run Back" Click="btnRunBack_Click" ToolTip="s"/>
-            <Button x:Name="btnRunForward" Content="Run Forward" Click="btnRunForward_Click" ToolTip="d"/>
-            <Button x:Name="btnBack" Content="Previous" Click="btnRunBack_Click" ToolTip="z"/>
-            <Button x:Name="btnForward" Content="Next" Click="btnRunForward_Click" ToolTip="v"/>
-            <Button x:Name="btnAddFolder" Content="Add Folder" Click="btnAddFolder_Click" ToolTip="f"/>
-            <Button x:Name="btnAddFiles" Content="Add Files" Click="btnAddFiles_Click" ToolTip="a"/>
+            <Button x:Name="btnPlay" Content="Play" Click="BtnPlay_Click" ToolTip="x"/>
+            <Button x:Name="btnPauseContinue" Content="Pause" Click="BtnPauseContinue_Click" ToolTip="c"/>
+            <Button x:Name="btnRunBack" Content="Run Back" Click="BtnRunBack_Click" ToolTip="s"/>
+            <Button x:Name="btnRunForward" Content="Run Forward" Click="BtnRunForward_Click" ToolTip="d"/>
+            <Button x:Name="btnPrevious" Content="Previous" Click="BtnPrevious_Click" ToolTip="z"/>
+            <Button x:Name="btnForward" Content="Next" Click="BtnForward_Click" ToolTip="v"/>
+            <Button x:Name="btnAddFolder" Content="Add Folder" Click="BtnAddFolder_Click" ToolTip="f"/>
+            <Button x:Name="btnAddFiles" Content="Add Files" Click="BtnAddFiles_Click" ToolTip="a"/>
         </StackPanel>
-        
+
         <!-- Line 4 -->
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="4">
             <TextBlock FontSize="10" VerticalAlignment="Center" Margin="0,0,5,0">Filtrar</TextBlock>
             <TextBox Width="200" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" />
         </StackPanel>
+
         <!-- Line 5 -->
-        <ListBox x:Name="listBoxMusics" Margin="0" Grid.Row="5" PreviewMouseDoubleClick="listMusics_PreviewMouseDoubleClick" FontSize="14" PreviewKeyDown="listMusics_PreviewKeyDown">
+        <ListBox x:Name="listBoxMusics" Margin="0" Grid.Row="5" PreviewMouseDoubleClick="ListMusics_PreviewMouseDoubleClick" FontSize="14" PreviewKeyDown="ListMusics_PreviewKeyDown">
             <ListBox.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Limpar Lista" Click="LimparLista_Click"></MenuItem>
@@ -112,6 +119,8 @@
             </ListBox.ContextMenu>
         </ListBox>
 
+        <!-- Line 6 -->
 
+            
     </Grid>
 </Window>
