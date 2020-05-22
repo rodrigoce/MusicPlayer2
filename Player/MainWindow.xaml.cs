@@ -14,24 +14,31 @@ namespace MusicPlayer2
         public MainWindow()
         {
             InitializeComponent();
-            IsPlaying(false);
         }
 
+        #region private fields
+        
+        bool _isPlaying;
+        
+        private string labelTextMusicName;
+
+        private DispatcherTimer timerMoveSlider;
+
+        #endregion
         private PlayList playList;
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            labelTextMusicName = textMusicName.Text;
             playList = new PlayList(mediaElement, listBoxMusics);
             playList.LoadListFromStorage();
             timerMoveSlider = new DispatcherTimer();
             timerMoveSlider.Interval = TimeSpan.FromSeconds(1);
             timerMoveSlider.Tick += new EventHandler(timer_Tick);
             IsPlaying(false);
-        }      
+        }
 
-        #region timmer
-
-        private DispatcherTimer timerMoveSlider;
+        #region timmer       
 
         private void timer_Tick(object sender, EventArgs e)
         {
@@ -58,15 +65,11 @@ namespace MusicPlayer2
         {
             if (btnPauseContinue.Content.ToString() == "Pause")
             {
-                mediaElement.Pause();
-                btnPauseContinue.Content = "Continue";
-                IsPlaying(false);
+                SetLikeContinue();
             }
             else
             {
-                mediaElement.Play();
-                btnPauseContinue.Content = "Pause";
-                IsPlaying(true);
+                SetLikePause();
             }
         }
 
@@ -114,6 +117,14 @@ namespace MusicPlayer2
 
         private void LimparLista_Click(object sender, RoutedEventArgs e)
         {
+            if (IsPlaying())
+            {
+                mediaElement.Stop();
+                IsPlaying(false);
+            }
+
+            sliderPositionOfMusic.Value = 0;
+            textMusicName.Text = labelTextMusicName;
             playList.ClearPlayList();
         }
 
@@ -182,6 +193,7 @@ namespace MusicPlayer2
 
         private void MoveNext()
         {
+            IsPlaying(false);
             playList.MoveToNextMusic();
             PlayNew();
         }
@@ -201,22 +213,45 @@ namespace MusicPlayer2
                 mediaElement.LoadedBehavior = MediaState.Manual;
                 mediaElement.UnloadedBehavior = MediaState.Manual;
                 mediaElement.Play();
+                SetLikePause();
                 listBoxMusics.SelectedIndex = listBoxMusics.Items.IndexOf(music.ItemOnListBox);
                 IsPlaying(true);
                 textMusicName.Text = music.Nro.ToString() + " -  " + music.Name;
             }
+            else
+                IsPlaying(false);
         }
 
         private void IsPlaying(bool value)
         {
-            //if (value) btnPauseContinue.Content = "Pause";
             btnPauseContinue.IsEnabled = (value || btnPauseContinue.Content.ToString().Equals("Continue"));
             btnRunBack.IsEnabled = value;
             btnRunForward.IsEnabled = value;
+            timerMoveSlider.IsEnabled = value;
+            _isPlaying = value;
+        }
+
+        private bool IsPlaying()
+        {
+            return _isPlaying;
+        }
+
+        private void SetLikeContinue()
+        {
+            mediaElement.Pause();
+            btnPauseContinue.Content = "Continue";
+            IsPlaying(false);
+        }
+
+        private void SetLikePause()
+        {
+            mediaElement.Play();
+            btnPauseContinue.Content = "Pause";
+            IsPlaying(true);
         }
 
         #endregion
 
-        
+
     }
 }

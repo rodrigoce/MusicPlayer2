@@ -8,7 +8,7 @@ using System.Windows;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("MusicPlayer2")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Reprodutor de MP3 com o intuito de ser simples.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("MusicPlayer2")]
