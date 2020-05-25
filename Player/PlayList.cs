@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 using System.Windows.Controls;
 using System.Windows.Forms;
 
@@ -10,16 +9,17 @@ namespace MusicPlayer2
 {
     public class PlayList
     {
-        public PlayList(MediaElement mediaElement, System.Windows.Controls.ListBox listBoxMusics)
+        public PlayList(MediaElement mediaElement, System.Windows.Controls.ListBox listBox)
         {
             this.mediaElement = mediaElement;
-            this.listBoxMusics = listBoxMusics;
+            this.listBoxMain = listBox;
             playListFileStorage = new PlayListFileStorage();
         }
 
         private readonly PlayListFileStorage playListFileStorage;
         private readonly MediaElement mediaElement;
-        private readonly System.Windows.Controls.ListBox listBoxMusics;
+        private readonly System.Windows.Controls.ListBox listBoxMain;
+        private List<Music> foundPlayList; 
         private Music currentMusic;
 
         private int GetLastPlayListIndex()
@@ -37,7 +37,7 @@ namespace MusicPlayer2
                 int last = GetLastPlayListIndex();
 
                 playListFileStorage.GetMusicRecursive(fd.SelectedPath);
-                LoadToListBoxMusics(last);
+                LoadToListBoxMusics(listBoxMain, playListFileStorage.PlayList, last, false);
                 playListFileStorage.Save();
             }
         }
@@ -51,24 +51,33 @@ namespace MusicPlayer2
             {
                 int last = GetLastPlayListIndex();
                 playListFileStorage.AddFiles(od.FileNames);
-                LoadToListBoxMusics(last);
+                LoadToListBoxMusics(listBoxMain, playListFileStorage.PlayList, last, false);
                 playListFileStorage.Save();
             }
         }
 
-        private void LoadToListBoxMusics(int startFrom)
+        public void SetCurrentMusicFinded(object selectedItem)
         {
-            for (int i = startFrom; i < playListFileStorage.PlayList.Count; i++)
+            if (selectedItem != null)
+                currentMusic = playListFileStorage.PlayList.Single(c => c.ItemOnFindListBox == selectedItem);
+        }
+
+        private void LoadToListBoxMusics(System.Windows.Controls.ListBox listBox, List<Music> listSource, int startFrom, bool AtFinder)
+        {
+            for (int i = startFrom; i < listSource.Count; i++)
             {
-                var music = playListFileStorage.PlayList[i];
-                listBoxMusics.Items.Add(music.Nro + " - " + music.Name);
-                music.ItemOnListBox = listBoxMusics.Items[listBoxMusics.Items.Count - 1];
+                var music = listSource[i];
+                listBox.Items.Add(music.Nro + " - " + music.Name);
+                if (!AtFinder)
+                    music.ItemOnListBox = listBox.Items[listBox.Items.Count - 1];
+                else
+                    music.ItemOnFindListBox = listBox.Items[listBox.Items.Count - 1];
             }
 
-            if ((playListFileStorage.PlayList.Count > 0) && (currentMusic == null))
+            if ((listSource.Count > 0) && (currentMusic == null))
             {
-                currentMusic = playListFileStorage.PlayList[0];
-                listBoxMusics.SelectedIndex = 0;
+                currentMusic = listSource[0];
+                listBox.SelectedIndex = 0;
             }
 
         }
@@ -76,7 +85,7 @@ namespace MusicPlayer2
         public void LoadListFromStorage()
         {
             playListFileStorage.Load();
-            LoadToListBoxMusics(0);
+            LoadToListBoxMusics(listBoxMain, playListFileStorage.PlayList, 0, false);
         }
 
         public void SetCurrentMusic(object selectedItem)
@@ -131,8 +140,25 @@ namespace MusicPlayer2
         {
             playListFileStorage.Clear();
             playListFileStorage.Save();
-            listBoxMusics.Items.Clear();
+            listBoxMain.Items.Clear();
         }
 
+        public void Find(System.Windows.Controls.ListBox listBox, string text)
+        {
+            if (text.Trim().Length > 0)
+            {
+                var keys = text.ForSearch().Split(' ');
+                keys = keys.Where(c => c.Trim() != "").ToArray();
+                string chaves = keys.Aggregate((i, j) => i + "|" + j);
+
+                foundPlayList = playListFileStorage.PlayList.Where(c => Regex.Match(c.NameForSearch, chaves).Success).ToList();
+                listBox.Items.Clear();
+                LoadToListBoxMusics(listBox, foundPlayList, 0, true);
+            }
+            else
+            {
+                listBox.Items.Clear();
+            }
+        }
     }
 }

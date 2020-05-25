@@ -13,5 +13,6 @@ namespace MusicPlayer2
         public string Name { get; set; }
         public string NameForSearch { get; set; }
         public object ItemOnListBox { get; set; }
+        public object ItemOnFindListBox { get; set; }
     }
 }

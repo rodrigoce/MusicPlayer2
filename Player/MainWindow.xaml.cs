@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
+using System.Linq;
 
 namespace MusicPlayer2
 {
@@ -25,6 +27,7 @@ namespace MusicPlayer2
         private DispatcherTimer timerMoveSlider;
 
         #endregion
+
         private PlayList playList;
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -65,11 +68,11 @@ namespace MusicPlayer2
         {
             if (btnPauseContinue.Content.ToString() == "Pause")
             {
-                SetLikeContinue();
+                SetAsPlaying();
             }
             else
             {
-                SetLikePause();
+                SetAsPaused();
             }
         }
 
@@ -87,6 +90,7 @@ namespace MusicPlayer2
         {
             MoveNext();
         }
+
         private void BtnPrevious_Click(object sender, RoutedEventArgs e)
         {
             MovePrevious();
@@ -138,6 +142,14 @@ namespace MusicPlayer2
             playList.AddFiles();
         }
 
+        private void BtnFind_Click(object sender, RoutedEventArgs e)
+        {
+            var find = new FindMusic(playList);
+            find.ShowDialog();
+            if (find.ReturnKind == ReturnKind.rkMusic)
+                PlayNew();
+        }
+
         private void SliderPositionOfMusic_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             timerMoveSlider.Tag = 0;
@@ -162,6 +174,42 @@ namespace MusicPlayer2
         private void SpeedSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             mediaElement.SpeedRatio = SpeedSlider.Value;
+        }
+
+        private void Window_PreviewKeyUp(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.X:
+                    PressButton(btnPlay);
+                    break;
+                case Key.C:
+                    PressButton(btnPauseContinue);
+                    break;
+                case Key.S:
+                    PressButton(btnRunBack);
+                    break;
+                case Key.D:
+                    PressButton(btnRunForward);
+                    break;
+                case Key.Z:
+                    PressButton(btnPrevious);
+                    break;
+                case Key.V:
+                    PressButton(btnForward);
+                    break;
+                case Key.F:
+                    PressButton(btnAddFolder);
+                    break;
+                case Key.A:
+                    PressButton(btnAddFiles);
+                    break;
+                case Key.Q:
+                    PressButton(btnFind);
+                    break;
+                default:
+                    break;
+            }
         }
 
         #endregion
@@ -213,8 +261,9 @@ namespace MusicPlayer2
                 mediaElement.LoadedBehavior = MediaState.Manual;
                 mediaElement.UnloadedBehavior = MediaState.Manual;
                 mediaElement.Play();
-                SetLikePause();
+                SetAsPaused();
                 listBoxMusics.SelectedIndex = listBoxMusics.Items.IndexOf(music.ItemOnListBox);
+                listBoxMusics.ScrollIntoView(listBoxMusics.SelectedItem);
                 IsPlaying(true);
                 textMusicName.Text = music.Nro.ToString() + " -  " + music.Name;
             }
@@ -236,22 +285,26 @@ namespace MusicPlayer2
             return _isPlaying;
         }
 
-        private void SetLikeContinue()
+        private void SetAsPlaying()
         {
             mediaElement.Pause();
             btnPauseContinue.Content = "Continue";
             IsPlaying(false);
         }
 
-        private void SetLikePause()
+        private void SetAsPaused()
         {
             mediaElement.Play();
             btnPauseContinue.Content = "Pause";
             IsPlaying(true);
         }
 
-        #endregion
+        private void PressButton(Button btn)
+        {
+            btn.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        }
 
+        #endregion
 
     }
 }
