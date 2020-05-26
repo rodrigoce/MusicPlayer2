@@ -41,6 +41,7 @@ namespace MusicPlayer2
                 playListFileStorage.Save();
             }
         }
+
         public void AddFiles()
         {
             var od = new OpenFileDialog();
@@ -117,6 +118,7 @@ namespace MusicPlayer2
             else
                 currentMusic = null;
         }
+
         public void MoveToPreviousMusic()
         {
             if (playListFileStorage.PlayList.Count > 0)
