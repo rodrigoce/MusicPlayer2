@@ -148,6 +148,10 @@ namespace MusicPlayer2
             find.ShowDialog();
             if (find.ReturnKind == ReturnKind.rkMusic)
                 PlayNew();
+            else if (find.ReturnKind == ReturnKind.rkFilter)
+            {
+                PlayNew();
+            }
         }
 
         private void SliderPositionOfMusic_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

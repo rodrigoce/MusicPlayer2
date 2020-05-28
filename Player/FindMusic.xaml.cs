@@ -4,7 +4,7 @@ using System.Windows.Input;
 
 namespace MusicPlayer2
 {
-    public enum ReturnKind { rkNone, rkMusic, rkLilter }
+    public enum ReturnKind { rkNone, rkMusic, rkFilter }
     /// <summary>
     /// Interaction logic for FindMusic.xaml
     /// </summary>
@@ -34,21 +34,20 @@ namespace MusicPlayer2
         {
             if (e.ChangedButton == MouseButton.Left)
             {
-                SetCurrentMusicFinded();
+                SetCurrentMusicFound();
             }
         }
 
         private void BtnOk_Click(object sender, RoutedEventArgs e)
         {
-            SetCurrentMusicFinded();
+            SetCurrentMusicFound();
         }
 
         private void BtnFilter_Click(object sender, RoutedEventArgs e)
         {
-            if (listBoxMusics.Items.Count > 0)
-            {
-
-            }
+            playList.PlayFiltered();
+            ReturnKind = ReturnKind.rkFilter;
+            Close();
         }
 
         #endregion
@@ -57,7 +56,7 @@ namespace MusicPlayer2
 
         private void TextFind_TextChanged(object sender, TextChangedEventArgs e)
         {
-            playList.Find(listBoxMusics, textFind.Text);
+            playList.Filter(listBoxMusics, textFind.Text);
         }
                 
         private void ListMusics_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -65,7 +64,7 @@ namespace MusicPlayer2
             if (e.Key == Key.Enter)
             {
                 e.Handled = true;
-                SetCurrentMusicFinded();
+                SetCurrentMusicFound();
             } 
         }
 
@@ -93,7 +92,7 @@ namespace MusicPlayer2
             else if (e.Key == Key.Enter)
             {
                 e.Handled = true;
-                SetCurrentMusicFinded();
+                SetCurrentMusicFound();
             }
         }
 
@@ -124,11 +123,11 @@ namespace MusicPlayer2
             }
         }
 
-        private void SetCurrentMusicFinded()
+        private void SetCurrentMusicFound()
         {
             if ((listBoxMusics.Items.Count > 0) && (listBoxMusics.SelectedItem != null))
             {
-                playList.SetCurrentMusicFinded(listBoxMusics.SelectedItem);
+                playList.SetCurrentMusicFound(listBoxMusics.SelectedItem);
                 ReturnKind = ReturnKind.rkMusic;
                 Close();
             }

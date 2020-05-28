@@ -18,7 +18,7 @@
             <TextBlock FontSize="12" VerticalAlignment="Center" Margin="0,0,5,0" Foreground="White">Find / Filter</TextBlock>
             <TextBox x:Name="textFind" Width="200" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" TextChanged="TextFind_TextChanged" PreviewKeyDown="TextFind_PreviewKeyDown" />
             <Button x:Name="BtnOk" Content="OK" Click="BtnOk_Click" />
-            <Button x:Name="BtnFilter" Content="Filter" Click="BtnFilter_Click" />
+            <Button x:Name="BtnFilter" Content="Filter" Click="BtnFilter_Click" Height="20" Margin="5,5,5,0" VerticalAlignment="Top" />
         </StackPanel>
 
         <ListBox x:Name="listBoxMusics" Margin="0" Grid.Row="1" PreviewMouseDoubleClick="ListMusics_PreviewMouseDoubleClick" FontSize="14" PreviewKeyDown="ListMusics_PreviewKeyDown" AlternationCount="2">
