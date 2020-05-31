@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MusicPlayer2"
         mc:Ignorable="d"
-        Title="Music Player 2" Height="700" Width="885" Loaded="Window_Loaded" PreviewKeyUp="Window_PreviewKeyUp">
+        Title="Music Player 2" Height="700" Width="885" Loaded="Window_Loaded" PreviewKeyUp="Window_PreviewKeyUp" PreviewKeyDown="Window_PreviewKeyDown">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"></RowDefinition>
@@ -79,9 +79,9 @@
         <!-- Line 3 -->
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="3">
             <Button x:Name="btnPlay" Content="Play" Click="BtnPlay_Click" ToolTip="x"/>
-            <Button x:Name="btnPauseContinue" Content="Pause" Click="BtnPauseContinue_Click" ToolTip="c"/>
-            <Button x:Name="btnRunBack" Content="Run Back" Click="BtnRunBack_Click" ToolTip="s"/>
-            <Button x:Name="btnRunForward" Content="Run Forward" Click="BtnRunForward_Click" ToolTip="d"/>
+            <Button x:Name="btnPauseContinue" Content="Pause" Click="BtnPauseContinue_Click" ToolTip="c ou space"/>
+            <Button x:Name="btnRunBack" Content="Run Back" Click="BtnRunBack_Click" ToolTip="s or left"/>
+            <Button x:Name="btnRunForward" Content="Run Forward" Click="BtnRunForward_Click" ToolTip="d or right"/>
             <Button x:Name="btnPrevious" Content="Previous" Click="BtnPrevious_Click" ToolTip="z"/>
             <Button x:Name="btnForward" Content="Next" Click="BtnForward_Click" ToolTip="v"/>
             <Button x:Name="btnAddFolder" Content="Add Folder" Click="BtnAddFolder_Click" ToolTip="f"/>

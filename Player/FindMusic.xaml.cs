@@ -92,6 +92,7 @@ namespace MusicPlayer2
             else if (e.Key == Key.Enter)
             {
                 e.Handled = true;
+                MoveSelectedItem(true);
                 SetCurrentMusicFound();
             }
         }

@@ -190,11 +190,8 @@ namespace MusicPlayer2
                 case Key.C:
                     PressButton(btnPauseContinue);
                     break;
-                case Key.S:
-                    PressButton(btnRunBack);
-                    break;
-                case Key.D:
-                    PressButton(btnRunForward);
+                case Key.Space:
+                    PressButton(btnPauseContinue);
                     break;
                 case Key.Z:
                     PressButton(btnPrevious);
@@ -210,6 +207,27 @@ namespace MusicPlayer2
                     break;
                 case Key.Q:
                     PressButton(btnFind);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.S:
+                    PressButton(btnRunBack);
+                    break;
+                case Key.Left:
+                    PressButton(btnRunBack);
+                    break;
+                case Key.D:
+                    PressButton(btnRunForward);
+                    break;
+                case Key.Right:
+                    PressButton(btnRunForward);
                     break;
                 default:
                     break;
@@ -310,5 +328,6 @@ namespace MusicPlayer2
 
         #endregion
 
+        
     }
 }
