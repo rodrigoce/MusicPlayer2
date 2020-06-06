@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using MahApps.Metro.Controls;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -8,7 +9,7 @@ namespace MusicPlayer2
     /// <summary>
     /// Interaction logic for FindMusic.xaml
     /// </summary>
-    public partial class FindMusic : Window
+    public partial class FindMusic : MetroWindow
     {
         public FindMusic(PlayList playList)
         {
@@ -92,7 +93,8 @@ namespace MusicPlayer2
             else if (e.Key == Key.Enter)
             {
                 e.Handled = true;
-                MoveSelectedItem(true);
+                if (listBoxMusics.SelectedItem == null)
+                    MoveSelectedItem(true);
                 SetCurrentMusicFound();
             }
         }
@@ -123,6 +125,8 @@ namespace MusicPlayer2
                 }
             }
         }
+
+        
 
         private void SetCurrentMusicFound()
         {

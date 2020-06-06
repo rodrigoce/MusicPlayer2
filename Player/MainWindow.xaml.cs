@@ -5,13 +5,16 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 using System.Linq;
+using MahApps.Metro.Controls;
+using System.Windows.Media;
+using System.Web.UI.WebControls;
 
 namespace MusicPlayer2
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : MetroWindow
     {
         public MainWindow()
         {
@@ -28,7 +31,7 @@ namespace MusicPlayer2
 
         #endregion
 
-        private PlayList playList;
+        public PlayList playList;
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -185,28 +188,28 @@ namespace MusicPlayer2
             switch (e.Key)
             {
                 case Key.X:
-                    PressButton(btnPlay);
+                    PressButton(btnPlay, e);
                     break;
                 case Key.C:
-                    PressButton(btnPauseContinue);
+                    PressButton(btnPauseContinue, e);
                     break;
                 case Key.Space:
-                    PressButton(btnPauseContinue);
+                    PressButton(btnPauseContinue, e);
                     break;
                 case Key.Z:
-                    PressButton(btnPrevious);
+                    PressButton(btnPrevious, e);
                     break;
                 case Key.V:
-                    PressButton(btnForward);
+                    PressButton(btnForward, e);
                     break;
                 case Key.F:
-                    PressButton(btnAddFolder);
+                    PressButton(btnAddFolder, e);
                     break;
                 case Key.A:
-                    PressButton(btnAddFiles);
+                    PressButton(btnAddFiles, e);
                     break;
                 case Key.Q:
-                    PressButton(btnFind);
+                    PressButton(btnFind, e);
                     break;
                 default:
                     break;
@@ -218,16 +221,16 @@ namespace MusicPlayer2
             switch (e.Key)
             {
                 case Key.S:
-                    PressButton(btnRunBack);
+                    PressButton(btnRunBack, e);
                     break;
                 case Key.Left:
-                    PressButton(btnRunBack);
+                    PressButton(btnRunBack, e);
                     break;
                 case Key.D:
-                    PressButton(btnRunForward);
+                    PressButton(btnRunForward, e);
                     break;
                 case Key.Right:
-                    PressButton(btnRunForward);
+                    PressButton(btnRunForward, e);
                     break;
                 default:
                     break;
@@ -286,6 +289,8 @@ namespace MusicPlayer2
                 SetAsPaused();
                 listBoxMusics.SelectedIndex = listBoxMusics.Items.IndexOf(music.ItemOnListBox);
                 listBoxMusics.ScrollIntoView(listBoxMusics.SelectedItem);
+                //listBoxMusics.Items.Add(new ListBoxItem() { Content = new TextBlock { Text = "P", Background = Brushes.Yellow } });
+                //MessageBox.Show(listBoxMusics.SelectedItem.ToString());
                 IsPlaying(true);
                 textMusicName.Text = music.Nro.ToString() + " -  " + music.Name;
             }
@@ -321,9 +326,10 @@ namespace MusicPlayer2
             IsPlaying(true);
         }
 
-        private void PressButton(Button btn)
+        private void PressButton(System.Windows.Controls.Button btn, KeyEventArgs e)
         {
-            btn.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            e.Handled = true;
+            btn.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Button.ClickEvent));
         }
 
         #endregion
