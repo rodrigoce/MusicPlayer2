@@ -1,6 +1,7 @@
 # MusicPlayer2
 
-It's a MP3 player, a study, my ou our minimalist open source Music Player.
+It's a MP3 player, a study, my or our minimalist open source Music Player.
+
 Written in .Net, WPF and C#
 
 # Roadmap
