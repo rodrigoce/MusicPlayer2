@@ -11,7 +11,6 @@ namespace MusicPlayer2
     public class PlayListFileStorage
     {
  
-        //public MusicList PlayList = new MusicList();
         public List<Music> PlayList = new List<Music>();
 
         public void GetMusicRecursive(string rootFolder)

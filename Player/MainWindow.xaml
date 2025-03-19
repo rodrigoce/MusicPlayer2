@@ -65,21 +65,76 @@
         <!-- Line 3 -->
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="3">
             <Button x:Name="btnPlay" Content="Play" Click="BtnPlay_Click" ToolTip="x" VerticalAlignment="Center"/>
-            <Button x:Name="btnPauseContinue" Content="Pause" Click="BtnPauseContinue_Click" ToolTip="c ou space" Margin="10,0" VerticalAlignment="Center"/>
+            <Button x:Name="btnPauseContinue" Content="Pause" Click="BtnPauseContinue_Click" ToolTip="c or space" Margin="10,0" VerticalAlignment="Center"/>
             <Button x:Name="btnRunBack" Content="Run Back" Click="BtnRunBack_Click" ToolTip="s or left" VerticalAlignment="Center"/>
             <Button x:Name="btnRunForward" Content="Run Forward" Click="BtnRunForward_Click" ToolTip="d or right" Margin="10,0" VerticalAlignment="Center"/>
             <Button x:Name="btnPrevious" Content="Previous" Click="BtnPrevious_Click" ToolTip="z" VerticalAlignment="Center"/>
             <Button x:Name="btnForward" Content="Next" Click="BtnForward_Click" ToolTip="v" Margin="10,0" VerticalAlignment="Center"/>
             <Button x:Name="btnAddFolder" Content="Add Folder" Click="BtnAddFolder_Click" ToolTip="f" VerticalAlignment="Center"/>
             <Button x:Name="btnAddFiles" Content="Add Files" Click="BtnAddFiles_Click" ToolTip="a" Margin="10,0" VerticalAlignment="Center"/>
-            <Button x:Name="btnFind" Content="Find/Filter" Click="BtnFind_Click" ToolTip="q" VerticalAlignment="Center"/>
+            <Button x:Name="btnFind" Content="Find/Filter" Click="BtnFind_Click" ToolTip="q" Margin="10,0" VerticalAlignment="Center"/>
+            <Button x:Name="btnKeyMap" Content="Key Map" VerticalAlignment="Center">
+                <Button.ToolTip>
+                    <ToolTip>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="x" FontWeight="Bold" Margin="0,0,10,0"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="Play"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="c/space" FontWeight="Bold" Margin="0,0,10,0"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="Pause/Continue"/>
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="s/left" FontWeight="Bold" Margin="0,0,10,0"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="run back"/>
+
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="d/right" FontWeight="Bold" Margin="0,0,10,0"/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="run forward"/>
+
+                            <TextBlock Grid.Row="4" Grid.Column="0" Text="z" FontWeight="Bold" Margin="0,0,10,0"/>
+                            <TextBlock Grid.Row="4" Grid.Column="1" Text="previous"/>
+
+                            <TextBlock Grid.Row="5" Grid.Column="0" Text="v" FontWeight="Bold" Margin="0,0,10,0"/>
+                            <TextBlock Grid.Row="5" Grid.Column="1" Text="next"/>
+
+                            <TextBlock Grid.Row="6" Grid.Column="0" Text="f" FontWeight="Bold" Margin="0,0,10,0"/>
+                            <TextBlock Grid.Row="6" Grid.Column="1" Text="add folder"/>
+
+                            <TextBlock Grid.Row="7" Grid.Column="0" Text="a" FontWeight="Bold" Margin="0,0,10,0"/>
+                            <TextBlock Grid.Row="7" Grid.Column="1" Text="add files"/>
+
+                            <TextBlock Grid.Row="8" Grid.Column="0" Text="q" FontWeight="Bold" Margin="0,0,10,0"/>
+                            <TextBlock Grid.Row="8" Grid.Column="1" Text="find"/>
+
+                            <TextBlock Grid.Row="9" Grid.Column="0" Text="delete" FontWeight="Bold" Margin="0,0,10,0"/>
+                            <TextBlock Grid.Row="9" Grid.Column="1" Text="delete file permanently"/>
+                        </Grid>
+                    </ToolTip>
+                </Button.ToolTip>
+            </Button>
         </StackPanel>
 
         <!-- Line 4 -->
         <ListBox x:Name="listBoxMusics" Margin="0" Grid.Row="4" PreviewMouseDoubleClick="ListMusics_PreviewMouseDoubleClick" FontSize="14" PreviewKeyDown="ListMusics_PreviewKeyDown" AlternationCount="2">
             <ListBox.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Limpar Lista" Click="LimparLista_Click"></MenuItem>
+                    <MenuItem Header="Clean Playlist" Click="CleanPlaylist_Click"></MenuItem>
+                    <MenuItem Header="Delete Permanently" Click="DeletePermanently_Click"></MenuItem>
                 </ContextMenu>
             </ListBox.ContextMenu>
         </ListBox>

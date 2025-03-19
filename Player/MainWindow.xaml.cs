@@ -8,6 +8,8 @@ using System.Linq;
 using MahApps.Metro.Controls;
 using System.Windows.Media;
 using System.Web.UI.WebControls;
+using MahApps.Metro.Controls.Dialogs;
+using System.Threading.Tasks;
 
 namespace MusicPlayer2
 {
@@ -21,12 +23,9 @@ namespace MusicPlayer2
             InitializeComponent();
         }
 
-        #region private fields
-        
-        bool _isPlaying;
+        #region private fields     
         
         private string labelTextMusicName;
-
         private DispatcherTimer timerMoveSlider;
 
         #endregion
@@ -35,13 +34,17 @@ namespace MusicPlayer2
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            mediaElement.LoadedBehavior = MediaState.Manual;
+            mediaElement.UnloadedBehavior = MediaState.Manual;
             labelTextMusicName = textMusicName.Text;
-            playList = new PlayList(mediaElement, listBoxMusics);
-            playList.LoadListFromStorage();
             timerMoveSlider = new DispatcherTimer();
+            playList = new PlayList(mediaElement, listBoxMusics, btnPauseContinue, btnRunBack, btnRunForward, timerMoveSlider, textMusicName);
+
+            playList.LoadListFromStorage();
             timerMoveSlider.Interval = TimeSpan.FromSeconds(1);
             timerMoveSlider.Tick += new EventHandler(timer_Tick);
-            IsPlaying(false);
+
+            playList.IsPlaying(false);
         }
 
         #region timmer       
@@ -64,19 +67,12 @@ namespace MusicPlayer2
         private void BtnPlay_Click(object sender, RoutedEventArgs e)
         {
             playList.SetCurrentMusic(listBoxMusics.SelectedItem);
-            PlayNew();
+            playList.PlayCurrentMusic();
         }
 
         private void BtnPauseContinue_Click(object sender, RoutedEventArgs e)
         {
-            if (btnPauseContinue.Content.ToString() == "Pause")
-            {
-                SetAsPlaying();
-            }
-            else
-            {
-                SetAsPaused();
-            }
+            playList.PauseContinue();
         }
 
         private void BtnRunBack_Click(object sender, RoutedEventArgs e)
@@ -109,7 +105,8 @@ namespace MusicPlayer2
             if (e.ChangedButton == MouseButton.Left)
             {
                 playList.SetCurrentMusic(listBoxMusics.SelectedItem);
-                PlayNew();
+                playList.IsPlaying(false);
+                playList.PlayCurrentMusic();
             }
         }
 
@@ -118,16 +115,16 @@ namespace MusicPlayer2
             if (e.Key == Key.Enter)
             {
                 playList.SetCurrentMusic(listBoxMusics.SelectedItem);
-                PlayNew();
+                playList.IsPlaying(false);
+                playList.PlayCurrentMusic();
             }
         }
 
-        private void LimparLista_Click(object sender, RoutedEventArgs e)
+        private void CleanPlaylist_Click(object sender, RoutedEventArgs e)
         {
-            if (IsPlaying())
+            if (playList.IsPlaying())
             {
-                mediaElement.Stop();
-                IsPlaying(false);
+                playList.IsPlaying(false);
             }
 
             sliderPositionOfMusic.Value = 0;
@@ -150,10 +147,10 @@ namespace MusicPlayer2
             var find = new FindMusic(playList);
             find.ShowDialog();
             if (find.ReturnKind == ReturnKind.rkMusic)
-                PlayNew();
+                playList.PlayCurrentMusic();
             else if (find.ReturnKind == ReturnKind.rkFilter)
             {
-                PlayNew();
+                playList.PlayCurrentMusic();
             }
         }
 
@@ -211,6 +208,9 @@ namespace MusicPlayer2
                 case Key.Q:
                     PressButton(btnFind, e);
                     break;
+                case Key.Delete:
+                    
+                    break;
                 default:
                     break;
             }
@@ -236,6 +236,29 @@ namespace MusicPlayer2
                     break;
             }
         }
+
+        private async void DeletePermanently_Click(object sender, RoutedEventArgs e)
+        {
+            var music = playList.SetCurrentSelectedMusic();
+            if (music != null) {
+                var result = await this.ShowMessageAsync(
+                                "Confirmação",
+                                $"Confirma a exclusão permanente do arquivo {music.Path}?",
+                                MessageDialogStyle.AffirmativeAndNegative,
+                                new MetroDialogSettings
+                                {
+                                    AffirmativeButtonText = "Sim",
+                                    NegativeButtonText = "Não",
+                                    AnimateShow = false,
+                                    AnimateHide = false,
+                                    DefaultButtonFocus = MessageDialogResult.Affirmative
+                                });
+
+                if (result == MessageDialogResult.Affirmative)
+                    playList.DeletePermanently(music);
+            }
+        }
+                
 
         #endregion
 
@@ -266,64 +289,16 @@ namespace MusicPlayer2
 
         private void MoveNext()
         {
-            IsPlaying(false);
+            playList.IsPlaying(false);
             playList.MoveToNextMusic();
-            PlayNew();
+            playList.PlayCurrentMusic();
         }
 
         private void MovePrevious()
         {
+            playList.IsPlaying(false);
             playList.MoveToPreviousMusic();
-            PlayNew();
-        }
-
-        private void PlayNew()
-        {
-            var music = playList.GetCurrrentMusic();
-            if (music != null)
-            {
-                mediaElement.Source = new Uri(music.Path);
-                mediaElement.LoadedBehavior = MediaState.Manual;
-                mediaElement.UnloadedBehavior = MediaState.Manual;
-                mediaElement.Play();
-                SetAsPaused();
-                listBoxMusics.SelectedIndex = listBoxMusics.Items.IndexOf(music.ItemOnListBox);
-                listBoxMusics.ScrollIntoView(listBoxMusics.SelectedItem);
-                //listBoxMusics.Items.Add(new ListBoxItem() { Content = new TextBlock { Text = "P", Background = Brushes.Yellow } });
-                //MessageBox.Show(listBoxMusics.SelectedItem.ToString());
-                IsPlaying(true);
-                textMusicName.Text = music.Nro.ToString() + " -  " + music.Name;
-            }
-            else
-                IsPlaying(false);
-        }
-
-        private void IsPlaying(bool value)
-        {
-            btnPauseContinue.IsEnabled = (value || btnPauseContinue.Content.ToString().Equals("Continue"));
-            btnRunBack.IsEnabled = value;
-            btnRunForward.IsEnabled = value;
-            timerMoveSlider.IsEnabled = value;
-            _isPlaying = value;
-        }
-
-        private bool IsPlaying()
-        {
-            return _isPlaying;
-        }
-
-        private void SetAsPlaying()
-        {
-            mediaElement.Pause();
-            btnPauseContinue.Content = "Continue";
-            IsPlaying(false);
-        }
-
-        private void SetAsPaused()
-        {
-            mediaElement.Play();
-            btnPauseContinue.Content = "Pause";
-            IsPlaying(true);
+            playList.PlayCurrentMusic();
         }
 
         private void PressButton(System.Windows.Controls.Button btn, KeyEventArgs e)
@@ -332,8 +307,8 @@ namespace MusicPlayer2
             btn.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Button.ClickEvent));
         }
 
+
         #endregion
 
-        
     }
 }
