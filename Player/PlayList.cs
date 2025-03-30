@@ -11,55 +11,48 @@ namespace MusicPlayer2
 {
     public class PlayList
     {
-        public PlayList(MediaElement mediaElement, ListBox listBox, Button btnPauseContinue, Button btnRunBack, Button btnRunForward, DispatcherTimer timerMoveSlider,
-            TextBlock txtMusicName)
+        public PlayList(MediaElement mediaElement, ListBox listBoxMusic, Button btnPauseContinue, Button btnRunBack, Button btnRunForward, DispatcherTimer timerMoveSlider,
+Slider sliderPositionOfMusic, TextBlock txtMusicName)
         {
             this.mediaElement = mediaElement;
-            this.listBoxMain = listBox;
+            this.listBoxMusic = listBoxMusic;
             this.playListFileStorage = new PlayListFileStorage();
             this.btnPauseContinue = btnPauseContinue;
             this.btnRunBack = btnRunBack;
             this.btnRunForward = btnRunForward;
             this.timerMoveSlider = timerMoveSlider;
+            this.sliderPositionOfMusic = sliderPositionOfMusic;
             this.txtMusicName = txtMusicName;
+            playListFileStorage.Load();
+            LoadToListBoxMusics(listBoxMusic, playListFileStorage.Files, 0, false, false);
         }
-
-        #region Fiels
-        
-        private readonly PlayListFileStorage playListFileStorage;
-        private readonly MediaElement mediaElement;
-        private readonly System.Windows.Controls.ListBox listBoxMain;
-        private List<Music> foundPlayList; 
-        private Music currentMusic;
-        private bool _isPlaying;
-        private Button btnPauseContinue;
-        private Button btnRunBack;
-        private Button btnRunForward;
-        private DispatcherTimer timerMoveSlider;
-        private TextBlock txtMusicName;
-        
-        #endregion
 
         #region Props
         
-        #endregion
-
-        private int GetLastPlayListIndex()
-        {
-            int last = playListFileStorage.PlayList.Count;
-           
-            return last;
-        }
+        private PlayListFileStorage playListFileStorage { get; set; }
+        private MediaElement mediaElement { get; set; }
+        private ListBox listBoxMusic { get; set; }
+        private List<Music> foundPlayList { get; set; } 
+        private Music CurrentMusic { get; set; }
+        private bool _isPlaying { get; set; }
+        private Button btnPauseContinue { get; set; }
+        private Button btnRunBack { get; set; }
+        private Button btnRunForward { get; set; }
+        private DispatcherTimer timerMoveSlider { get; set; }
+        private Slider sliderPositionOfMusic { get; set; }
+        private TextBlock txtMusicName { get; set; }
         
+        #endregion
+      
         public void AddFolder()
         {
             var fd = new System.Windows.Forms.FolderBrowserDialog();
             if (fd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                int last = GetLastPlayListIndex();
+                int last = playListFileStorage.Files.Count;
 
                 playListFileStorage.GetMusicRecursive(fd.SelectedPath);
-                LoadToListBoxMusics(listBoxMain, playListFileStorage.PlayList, last, false, false);
+                LoadToListBoxMusics(listBoxMusic, playListFileStorage.Files, last, false, false);
                 playListFileStorage.Save();
             }
         }
@@ -72,9 +65,9 @@ namespace MusicPlayer2
 
             if (od.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                int last = GetLastPlayListIndex();
+                int last = playListFileStorage.Files.Count;
                 playListFileStorage.AddFiles(od.FileNames);
-                LoadToListBoxMusics(listBoxMain, playListFileStorage.PlayList, last, false, false);
+                LoadToListBoxMusics(listBoxMusic, playListFileStorage.Files, last, false, false);
                 playListFileStorage.Save();
             }
         }
@@ -110,25 +103,23 @@ namespace MusicPlayer2
 
             if (!InFindScreen)
             {
-                if ((listBoxMain.Items.Count > 0) && (currentMusic == null))
+                if ((listBoxMusic.Items.Count > 0) && (CurrentMusic == null))
                 {
-                    SetCurrentMusic(listBoxMain.Items[0]);
-                    listBoxMain.SelectedIndex = 0;
+                    //SetCurrentMusic(listBoxMusic.Items[0]);
+                    listBoxMusic.SelectedIndex = 0;
                 }
             }
-        }
-
-        public void LoadListFromStorage()
-        {
-            playListFileStorage.Load();
-            LoadToListBoxMusics(listBoxMain, playListFileStorage.PlayList, 0, false, false);
-        }
+        }              
 
         public void ClearPlayList()
         {
+            Stop2();
+
+            sliderPositionOfMusic.Value = 0;
+            txtMusicName.Text = System.Windows.Application.Current.Resources["txtMusicNameDefaultText"] as string;
             playListFileStorage.Clear();
             playListFileStorage.Save();
-            listBoxMain.Items.Clear();
+            listBoxMusic.Items.Clear();
         }
 
 
@@ -140,7 +131,7 @@ namespace MusicPlayer2
                 keys = keys.Where(c => c.Trim() != "").ToArray();
                 string chaves = keys.Aggregate((i, j) => i + "|" + j);
 
-                foundPlayList = playListFileStorage.PlayList.Where(c => Regex.Match(c.NameForSearch, chaves).Success).ToList();
+                foundPlayList = playListFileStorage.Files.Where(c => Regex.Match(c.NameForSearch, chaves).Success).ToList();
                 listBox.Items.Clear();
                 LoadToListBoxMusics(listBox, foundPlayList, 0, true, false);
             }
@@ -149,124 +140,127 @@ namespace MusicPlayer2
                 listBox.Items.Clear();
             }
         }
-
-        public void PlayFiltered()
-        {
-            playListFileStorage.PlayList.ForEach(c => c.IsInFilter = false);
-            foreach (var music in foundPlayList)
-            {
-                playListFileStorage.PlayList.Single(c => c.Nro == music.Nro).IsInFilter = true;
-            }
-            currentMusic = null;
-            listBoxMain.Items.Clear();
-            LoadToListBoxMusics(listBoxMain, playListFileStorage.PlayList, 0, false, true);
-        }
-
+        
         public void DeletePermanently(Music music)
         {
-            if (music == GetCurrrentMusic())
-                File.Delete(music.Path);
+            if (music == CurrentMusic)
+                //SetIsPlaying(false);
+
+            File.Delete(music.Path);
+            playListFileStorage.Files.Remove(music);
+            listBoxMusic.Items.Remove(music.ItemOnListBox);
+            playListFileStorage.Save();
+            CurrentMusic = null;
+
         }
 
-        public void SetCurrentMusicFound(object selectedItem)
-        {
-            if (selectedItem != null)
-                currentMusic = playListFileStorage.PlayList.Single(c => c.ItemOnFindListBox == selectedItem);
-        }
 
-        public Music SetCurrentSelectedMusic()
-        {
-            if (listBoxMain.SelectedItem != null)
-                return playListFileStorage.PlayList.Single(c => c.ItemOnListBox == listBoxMain.SelectedItem);
-            return null;
-        }
 
-        public void SetCurrentMusic(object selectedItem)
-        {
-            if (selectedItem != null)
-                currentMusic = playListFileStorage.PlayList.Single(c => c.ItemOnListBox == selectedItem);
-        }
+        
 
-        public Music GetCurrrentMusic()
-        {
-            return currentMusic;
-        }
+        
 
-        public void MoveToNextMusic()
+        
+
+
+        ////////////////////////////////
+        ////////////////////////////////
+
+        public void Play2(bool playFromListBox)
         {
-            if (playListFileStorage.PlayList.Count > 0)
+            if (playFromListBox) 
+                if (listBoxMusic.SelectedItem != null)
+                    CurrentMusic = playListFileStorage.Files.FirstOrDefault(c => c.ItemOnListBox == listBoxMusic.SelectedItem);
+            
+            if (CurrentMusic != null)
             {
-                var index = playListFileStorage.PlayList.IndexOf(currentMusic);
+                mediaElement.Source = new Uri(CurrentMusic.Path);
+                mediaElement.Play();
+                _isPlaying = true;
+                listBoxMusic.SelectedIndex = listBoxMusic.Items.IndexOf(CurrentMusic.ItemOnListBox);
+                listBoxMusic.ScrollIntoView(listBoxMusic.SelectedItem);
+                RefreshControlsStatus2(false);
+                
+            }
+            else
+                RefreshControlsStatus2(true);
+        
 
-                if (index < playListFileStorage.PlayList.Count - 1)
+        }
+
+        public void RefreshControlsStatus2(bool isStoped)
+        {
+            btnPauseContinue.IsEnabled = !isStoped;
+            btnRunBack.IsEnabled = !isStoped;
+            btnRunForward.IsEnabled = !isStoped;
+            timerMoveSlider.IsEnabled = !isStoped;
+
+            if (CurrentMusic != null)
+                txtMusicName.Text = CurrentMusic.Nro.ToString() + " -  " + CurrentMusic.Name;
+
+            if (isStoped)
+            {
+                sliderPositionOfMusic.Value = 0;
+                txtMusicName.Text = System.Windows.Application.Current.Resources["txtMusicNameDefaultText"] as string;
+            }
+        }
+
+        public void Stop2()
+        {
+            mediaElement.Stop();
+            _isPlaying = false;
+            RefreshControlsStatus2(true);
+        }
+
+        public void PlayNextMusic2()
+        {
+            Stop2();
+
+            if (playListFileStorage.Files.Count > 0)
+            {
+                var index = playListFileStorage.Files.IndexOf(CurrentMusic);
+
+                if (index < playListFileStorage.Files.Count - 1)
                 {
-                    currentMusic = playListFileStorage.PlayList[++index];
+                    CurrentMusic = playListFileStorage.Files[++index];
                 }
                 else
                 {
-                    currentMusic = playListFileStorage.PlayList[0];
+                    CurrentMusic = playListFileStorage.Files[0];
                 }
             }
             else
-                currentMusic = null;
+                CurrentMusic = null;
+
+            Play2(false);
         }
 
-        public void MoveToPreviousMusic()
+        public void PlayPreviousMusic2()
         {
-            if (playListFileStorage.PlayList.Count > 0)
+            Stop2();
+
+            if (playListFileStorage.Files.Count > 0)
             {
-                var index = playListFileStorage.PlayList.IndexOf(currentMusic);
+                var index = playListFileStorage.Files.IndexOf(CurrentMusic);
 
                 if (index == 0)
                 {
-                    currentMusic = playListFileStorage.PlayList[playListFileStorage.PlayList.Count - 1];
+                    CurrentMusic = playListFileStorage.Files[playListFileStorage.Files.Count - 1];
                 }
                 else
                 {
-                    currentMusic = playListFileStorage.PlayList[--index];
+                    CurrentMusic = playListFileStorage.Files[--index];
                 }
             }
             else
-                currentMusic = null;
+                CurrentMusic = null;
+
+            Play2(false);
         }
 
-
-        public void IsPlaying(bool value)
+        public void PauseContinue2()
         {
-            if (!value)
-                mediaElement.Stop();
-
-            btnPauseContinue.IsEnabled = (value || btnPauseContinue.Content.ToString().Equals("Continue"));
-            btnRunBack.IsEnabled = value;
-            btnRunForward.IsEnabled = value;
-            timerMoveSlider.IsEnabled = value;
-            _isPlaying = value;
-        }
-
-        public bool IsPlaying()
-        {
-            return _isPlaying;
-        }
-
-        public void PlayCurrentMusic()
-        {
-            var music = GetCurrrentMusic();
-            if (music != null)
-            {
-                mediaElement.Source = new Uri(music.Path);
-                mediaElement.Play();
-                listBoxMain.SelectedIndex = listBoxMain.Items.IndexOf(music.ItemOnListBox);
-                listBoxMain.ScrollIntoView(listBoxMain.SelectedItem);
-                IsPlaying(true);
-                txtMusicName.Text = music.Nro.ToString() + " -  " + music.Name;
-            }
-            else
-                IsPlaying(false);
-        }
-
-        public void PauseContinue()
-        {
-            if (IsPlaying())
+            if (_isPlaying)
             {
                 if (btnPauseContinue.Content.ToString() == "Pause")
                 {
@@ -280,6 +274,5 @@ namespace MusicPlayer2
                 }
             }
         }
-
     }
 }

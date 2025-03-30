@@ -19,9 +19,9 @@ namespace MusicPlayer2
             textFind.Focus();
         }
 
-        #region fields
+        #region Props
 
-        private readonly PlayList playList;
+        private PlayList playList { get; set; }
 
         public ReturnKind ReturnKind { get; private set; }
 
@@ -46,7 +46,7 @@ namespace MusicPlayer2
 
         private void BtnFilter_Click(object sender, RoutedEventArgs e)
         {
-            playList.PlayFiltered();
+            //playList.PlayFiltered();
             ReturnKind = ReturnKind.rkFilter;
             Close();
         }
@@ -132,7 +132,7 @@ namespace MusicPlayer2
         {
             if ((listBoxMusics.Items.Count > 0) && (listBoxMusics.SelectedItem != null))
             {
-                playList.SetCurrentMusicFound(listBoxMusics.SelectedItem);
+                //playList.SetCurrentMusicFound(listBoxMusics.SelectedItem);
                 ReturnKind = ReturnKind.rkMusic;
                 Close();
             }

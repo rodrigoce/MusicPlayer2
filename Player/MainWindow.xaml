@@ -6,7 +6,7 @@
         xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         xmlns:local="clr-namespace:MusicPlayer2"
         mc:Ignorable="d"
-        Title="Music Player 2" Height="700" Width="885" Icon="icon.ico" Loaded="Window_Loaded" PreviewKeyUp="Window_PreviewKeyUp" PreviewKeyDown="Window_PreviewKeyDown">
+        Title="Music Player 2" Height="700" Width="885" Icon="icon.ico" Loaded="Window_Loaded" PreviewKeyUp="Window_PreviewKeyUp" PreviewKeyDown="Window_PreviewKeyDown" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"></RowDefinition>
@@ -19,7 +19,7 @@
         <!-- Line 0 -->
         <Rectangle Fill="Black" />
         <MediaElement x:Name="mediaElement" IsManipulationEnabled="True" MediaOpened="MediaElement_MediaOpened" ForceCursor="True" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="60" Height="30" MediaEnded="MediaElement_MediaEnded" MediaFailed="MediaElement_MediaFailed" />
-        <TextBlock x:Name="textMusicName" HorizontalAlignment="Center" TextWrapping="Wrap" Text="I'm waiting for you to press play!!!" VerticalAlignment="Center" FontSize="16" Foreground="White" FontWeight="Bold" />
+        <TextBlock x:Name="textMusicName" HorizontalAlignment="Center" TextWrapping="Wrap" Text="{DynamicResource txtMusicNameDefaultText}" VerticalAlignment="Center" FontSize="16" Foreground="White" FontWeight="Bold" />
 
         <!-- Line 1 -->
         <Slider x:Name="sliderPositionOfMusic" Value="0" VerticalAlignment="Center" Grid.Row="1" PreviewMouseLeftButtonUp="SliderPositionOfMusic_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="SliderPositionOfMusic_PreviewMouseLeftButtonDown"/>

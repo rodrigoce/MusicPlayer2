@@ -27,10 +27,9 @@ namespace MusicPlayer2
         
         private string labelTextMusicName;
         private DispatcherTimer timerMoveSlider;
+        private PlayList playList;
 
         #endregion
-
-        public PlayList playList;
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -38,13 +37,12 @@ namespace MusicPlayer2
             mediaElement.UnloadedBehavior = MediaState.Manual;
             labelTextMusicName = textMusicName.Text;
             timerMoveSlider = new DispatcherTimer();
-            playList = new PlayList(mediaElement, listBoxMusics, btnPauseContinue, btnRunBack, btnRunForward, timerMoveSlider, textMusicName);
+            playList = new PlayList(mediaElement, listBoxMusics, btnPauseContinue, btnRunBack, btnRunForward, timerMoveSlider, sliderPositionOfMusic, textMusicName);
 
-            playList.LoadListFromStorage();
             timerMoveSlider.Interval = TimeSpan.FromSeconds(1);
             timerMoveSlider.Tick += new EventHandler(timer_Tick);
 
-            playList.IsPlaying(false);
+            playList.Stop2();
         }
 
         #region timmer       
@@ -66,13 +64,12 @@ namespace MusicPlayer2
 
         private void BtnPlay_Click(object sender, RoutedEventArgs e)
         {
-            playList.SetCurrentMusic(listBoxMusics.SelectedItem);
-            playList.PlayCurrentMusic();
-        }
+            playList.Play2(true);
+        }               
 
         private void BtnPauseContinue_Click(object sender, RoutedEventArgs e)
         {
-            playList.PauseContinue();
+            playList.PauseContinue2();
         }
 
         private void BtnRunBack_Click(object sender, RoutedEventArgs e)
@@ -87,12 +84,12 @@ namespace MusicPlayer2
 
         private void BtnForward_Click(object sender, RoutedEventArgs e)
         {
-            MoveNext();
+            playList.PlayNextMusic2();
         }
 
         private void BtnPrevious_Click(object sender, RoutedEventArgs e)
         {
-            MovePrevious();
+            playList.PlayPreviousMusic2();
         }
 
         private void Mute_Click(object sender, RoutedEventArgs e)
@@ -103,34 +100,19 @@ namespace MusicPlayer2
         private void ListMusics_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left)
-            {
-                playList.SetCurrentMusic(listBoxMusics.SelectedItem);
-                playList.IsPlaying(false);
-                playList.PlayCurrentMusic();
-            }
+                playList.Play2(true);
         }
 
         private void ListMusics_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
-            {
-                playList.SetCurrentMusic(listBoxMusics.SelectedItem);
-                playList.IsPlaying(false);
-                playList.PlayCurrentMusic();
-            }
+                playList.Play2(true);
         }
 
         private void CleanPlaylist_Click(object sender, RoutedEventArgs e)
         {
-            if (playList.IsPlaying())
-            {
-                playList.IsPlaying(false);
-            }
-
-            sliderPositionOfMusic.Value = 0;
-            textMusicName.Text = labelTextMusicName;
             playList.ClearPlayList();
-        }
+        }       
 
         private void BtnAddFolder_Click(object sender, RoutedEventArgs e)
         {
@@ -146,12 +128,12 @@ namespace MusicPlayer2
         {
             var find = new FindMusic(playList);
             find.ShowDialog();
-            if (find.ReturnKind == ReturnKind.rkMusic)
+            /*if (find.ReturnKind == ReturnKind.rkMusic)
                 playList.PlayCurrentMusic();
             else if (find.ReturnKind == ReturnKind.rkFilter)
             {
                 playList.PlayCurrentMusic();
-            }
+            }*/
         }
 
         private void SliderPositionOfMusic_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -180,7 +162,7 @@ namespace MusicPlayer2
             mediaElement.SpeedRatio = SpeedSlider.Value;
         }
 
-        private void Window_PreviewKeyUp(object sender, KeyEventArgs e)
+        private async void Window_PreviewKeyUp(object sender, KeyEventArgs e)
         {
             switch (e.Key)
             {
@@ -209,7 +191,7 @@ namespace MusicPlayer2
                     PressButton(btnFind, e);
                     break;
                 case Key.Delete:
-                    
+                    await AskDeletePermanently();
                     break;
                 default:
                     break;
@@ -239,8 +221,14 @@ namespace MusicPlayer2
 
         private async void DeletePermanently_Click(object sender, RoutedEventArgs e)
         {
-            var music = playList.SetCurrentSelectedMusic();
-            if (music != null) {
+            await AskDeletePermanently();
+        }
+
+        private async Task AskDeletePermanently()
+        {
+            /*var music = playList.SetCurrentSelectedMusic();
+            if (music != null)
+            {
                 var result = await this.ShowMessageAsync(
                                 "Confirmação",
                                 $"Confirma a exclusão permanente do arquivo {music.Path}?",
@@ -256,9 +244,9 @@ namespace MusicPlayer2
 
                 if (result == MessageDialogResult.Affirmative)
                     playList.DeletePermanently(music);
-            }
+            }*/
         }
-                
+
 
         #endregion
 
@@ -274,32 +262,16 @@ namespace MusicPlayer2
         private void MediaElement_MediaEnded(object sender, RoutedEventArgs e)
         {
             timerMoveSlider.Stop();
-            MoveNext();
+            playList.PlayNextMusic2();
         }
 
         private void MediaElement_MediaFailed(object sender, ExceptionRoutedEventArgs e)
         {
             timerMoveSlider.Stop();
-            MoveNext();
+            playList.PlayNextMusic2();
         }
 
         #endregion
-
-        #region reusable methods   
-
-        private void MoveNext()
-        {
-            playList.IsPlaying(false);
-            playList.MoveToNextMusic();
-            playList.PlayCurrentMusic();
-        }
-
-        private void MovePrevious()
-        {
-            playList.IsPlaying(false);
-            playList.MoveToPreviousMusic();
-            playList.PlayCurrentMusic();
-        }
 
         private void PressButton(System.Windows.Controls.Button btn, KeyEventArgs e)
         {
@@ -307,8 +279,6 @@ namespace MusicPlayer2
             btn.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Button.ClickEvent));
         }
 
-
-        #endregion
 
     }
 }

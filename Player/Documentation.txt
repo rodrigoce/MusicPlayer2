@@ -1,0 +1,15 @@
+Functions Descripition:
+
+- Play: Start or resume the playback of the SELECTED music.
+- Stop: Stop the playback of the CURRENT music.
+- Pause/Continue: Pause or continue the playback of the CURRENT music.
+- Run Back: Skip back 5s then CURRENT music.
+- Run Forward: Skip forward 5s the CURRENT music.
+- Previous: Play the previous music in relation of the CURRENT music.
+- Next: Play the next music in relation of the CURRENT music.
+
+- Add Folder: Add a folder to the playlist.
+- Add Files: Add a files to the playlist.
+- Find/Filter: Find or filter the media items in the playlist or remove Filter.
+- Clean Playlist: 'Stop' and Remove all media items from the playlist.
+- Delete Permanently: 'Stop' if selected file to deletion is playing and Delete the selected media item permanently.

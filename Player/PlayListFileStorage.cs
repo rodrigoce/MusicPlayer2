@@ -11,7 +11,7 @@ namespace MusicPlayer2
     public class PlayListFileStorage
     {
  
-        public List<Music> PlayList = new List<Music>();
+        public List<Music> Files { get; set; } = new List<Music>();
 
         public void GetMusicRecursive(string rootFolder)
         {
@@ -33,8 +33,8 @@ namespace MusicPlayer2
             {
                 if (file.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase))
                 {
-                    var music = new Music() { Nro = PlayList.Count + 1, Name = Path.GetFileNameWithoutExtension(file), NameForSearch = Path.GetFileNameWithoutExtension(file).ForSearch(), Path = file };
-                    PlayList.Add(music);
+                    var music = new Music() { Nro = Files.Count + 1, Name = Path.GetFileNameWithoutExtension(file), NameForSearch = Path.GetFileNameWithoutExtension(file).ForSearch(), Path = file };
+                    Files.Add(music);
                 }
             }
         }
@@ -42,7 +42,7 @@ namespace MusicPlayer2
         private List<string> ListToLines()
         {
             var sl = new List<string>();
-            foreach (var item in PlayList)
+            foreach (var item in Files)
             {
                 sl.Add(item.Name + Constantes.RECORD_SEPARATOR +
                     item.NameForSearch + Constantes.RECORD_SEPARATOR +
@@ -78,9 +78,9 @@ namespace MusicPlayer2
                 foreach (var item in f)
                 {
                     var separated = item.Split(Constantes.RECORD_SEPARATOR);
-                    PlayList.Add(new Music()
+                    Files.Add(new Music()
                     {
-                        Nro = PlayList.Count + 1,
+                        Nro = Files.Count + 1,
                         Name = separated[0],
                         NameForSearch = separated[1],
                         Path = separated[2],
@@ -88,6 +88,11 @@ namespace MusicPlayer2
                     });
                 }
             }
+        }
+
+        public void Clear()
+        {
+            Files.Clear();
         }
 
         /*
@@ -160,10 +165,5 @@ namespace MusicPlayer2
             }
         }
         */
-
-        public void Clear()
-        {
-            PlayList.Clear();
-        }
     }
 }
