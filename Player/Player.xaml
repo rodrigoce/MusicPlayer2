@@ -1,4 +1,4 @@
-﻿<mah:MetroWindow x:Class="MusicPlayer2.MainWindow"
+﻿<mah:MetroWindow x:Class="MusicPlayer2.Player"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -7,6 +7,9 @@
         xmlns:local="clr-namespace:MusicPlayer2"
         mc:Ignorable="d"
         Title="Music Player 2" Height="700" Width="885" Icon="icon.ico" Loaded="Window_Loaded" PreviewKeyUp="Window_PreviewKeyUp" PreviewKeyDown="Window_PreviewKeyDown" WindowStartupLocation="CenterScreen">
+    <Window.DataContext>
+        <local:PlayerViewModel />
+    </Window.DataContext>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"></RowDefinition>
@@ -19,29 +22,13 @@
         <!-- Line 0 -->
         <Rectangle Fill="Black" />
         <MediaElement x:Name="mediaElement" IsManipulationEnabled="True" MediaOpened="MediaElement_MediaOpened" ForceCursor="True" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="60" Height="30" MediaEnded="MediaElement_MediaEnded" MediaFailed="MediaElement_MediaFailed" />
-        <TextBlock x:Name="textMusicName" HorizontalAlignment="Center" TextWrapping="Wrap" Text="{DynamicResource txtMusicNameDefaultText}" VerticalAlignment="Center" FontSize="16" Foreground="White" FontWeight="Bold" />
+        <TextBlock x:Name="textMusicName" HorizontalAlignment="Center" TextWrapping="Wrap" Text="{Binding CurrentMusicName, Mode=OneWay}" VerticalAlignment="Center" FontSize="16" Foreground="White" FontWeight="Bold" />
 
         <!-- Line 1 -->
         <Slider x:Name="sliderPositionOfMusic" Value="0" VerticalAlignment="Center" Grid.Row="1" PreviewMouseLeftButtonUp="SliderPositionOfMusic_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="SliderPositionOfMusic_PreviewMouseLeftButtonDown"/>
 
         <!-- Line 2 -->
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="2">
-            <!--
-            <StackPanel.Resources>
-                <Style TargetType="ToggleButton" BasedOn="{StaticResource MahApps.Styles.ToggleButton}">
-                    <Setter Property="Margin" Value="5"/>
-                    
-                    <Setter Property="VerticalAlignment" Value="Center"/>
-                    <Setter Property="Width" Value="50"/>
-                </Style>
-                <Style TargetType="TextBlock">
-                    <Setter Property="VerticalAlignment" Value="Center"/>
-                    <Setter Property="FontSize" Value="12"/>
-                </Style>
-
-            </StackPanel.Resources>
-            -->
-
             <TextBlock x:Name="currentSecond" Text="*" Width="70" TextAlignment="Right" VerticalAlignment="Center" Margin="0"/>
 
             <ToggleButton x:Name="Mute" Click="Mute_Click" Margin="10,0" VerticalAlignment="Center">Mute</ToggleButton>
@@ -61,19 +48,20 @@
             <TextBlock x:Name="totalSeconds" Text="*" Width="70" VerticalAlignment="Center"/>
         </StackPanel>
 
-
         <!-- Line 3 -->
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="3">
-            <Button x:Name="btnPlay" Content="Play" Click="BtnPlay_Click" ToolTip="x" VerticalAlignment="Center"/>
-            <Button x:Name="btnPauseContinue" Content="Pause" Click="BtnPauseContinue_Click" ToolTip="c or space" Margin="10,0" VerticalAlignment="Center"/>
-            <Button x:Name="btnRunBack" Content="Run Back" Click="BtnRunBack_Click" ToolTip="s or left" VerticalAlignment="Center"/>
-            <Button x:Name="btnRunForward" Content="Run Forward" Click="BtnRunForward_Click" ToolTip="d or right" Margin="10,0" VerticalAlignment="Center"/>
-            <Button x:Name="btnPrevious" Content="Previous" Click="BtnPrevious_Click" ToolTip="z" VerticalAlignment="Center"/>
-            <Button x:Name="btnForward" Content="Next" Click="BtnForward_Click" ToolTip="v" Margin="10,0" VerticalAlignment="Center"/>
-            <Button x:Name="btnAddFolder" Content="Add Folder" Click="BtnAddFolder_Click" ToolTip="f" VerticalAlignment="Center"/>
-            <Button x:Name="btnAddFiles" Content="Add Files" Click="BtnAddFiles_Click" ToolTip="a" Margin="10,0" VerticalAlignment="Center"/>
-            <Button x:Name="btnFind" Content="Find/Filter" Click="BtnFind_Click" ToolTip="q" Margin="10,0" VerticalAlignment="Center"/>
-            <Button x:Name="btnKeyMap" Content="Key Map" VerticalAlignment="Center">
+            <Button x:Name="btnPlay" Content="Play" Command="{Binding PlayCommand}" ToolTip="x" VerticalAlignment="Center"/>
+            <Button x:Name="btnStop" Content="Stop" Command="{Binding StopCommand}" ToolTip="refazer atalhos" Margin="10,0" VerticalAlignment="Center"/>
+            <Button x:Name="btnPauseContinue" Content="Pause" Command="{Binding PauseContinueCommand}" ToolTip="c or space" Margin="10,0" VerticalAlignment="Center"/>
+            <Button x:Name="btnRunBack" Content="Run Back" Command="{Binding RunBackCommand}" ToolTip="s or left" VerticalAlignment="Center"/>
+            <Button x:Name="btnRunForward" Content="Run Forward" Command="{Binding RunForwardCommand}" ToolTip="d or right" Margin="10,0" VerticalAlignment="Center"/>
+            <Button x:Name="btnPrevious" Content="Previous" Command="{Binding PreviousCommand}" ToolTip="z" VerticalAlignment="Center"/>
+            <Button x:Name="btnNext" Content="Next" Command="{Binding NextCommand}" ToolTip="v" Margin="10,0" VerticalAlignment="Center"/>
+            <Button x:Name="btnAddFolder" Content="Add Folder" Command="{Binding AddFolderCommand}" ToolTip="f" VerticalAlignment="Center"/>
+            <Button x:Name="btnAddFiles" Content="Add Files" Command="{Binding AddFilesCommand}" ToolTip="a" Margin="10,0" VerticalAlignment="Center"/>
+            <Button x:Name="btnFind" Content="Find/Filter" Click="BtnFind_Click" ToolTip="q" VerticalAlignment="Center"/>
+            <Button x:Name="btnKeyMap" Content="Key Map" Margin="10,0" VerticalAlignment="Center">
+
                 <Button.ToolTip>
                     <ToolTip>
                         <Grid>
@@ -127,13 +115,24 @@
                     </ToolTip>
                 </Button.ToolTip>
             </Button>
+            <Button x:Name="btnTests" Content="Tests" ToolTip="q" Margin="10,0" VerticalAlignment="Center" Click="btnTests_Click" />
         </StackPanel>
 
         <!-- Line 4 -->
-        <ListBox x:Name="listBoxMusics" Margin="0" Grid.Row="4" PreviewMouseDoubleClick="ListMusics_PreviewMouseDoubleClick" FontSize="14" PreviewKeyDown="ListMusics_PreviewKeyDown" AlternationCount="2">
+        <ListBox x:Name="listBoxMusics" Margin="0" Grid.Row="4" PreviewMouseDoubleClick="ListMusics_PreviewMouseDoubleClick" FontSize="14" 
+                 PreviewKeyDown="ListMusics_PreviewKeyDown" AlternationCount="2" ItemsSource="{Binding MusicsList}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <TextBlock Text="{Binding Nro}" FontWeight="Bold" Margin="0,0,5,0"/>
+                        <TextBlock Text=" - " Foreground="Green" Margin="0,0,5,0"/>
+                        <TextBlock Text="{Binding Name}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
             <ListBox.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Clean Playlist" Click="CleanPlaylist_Click"></MenuItem>
+                    <MenuItem Header="Clean Playlist" Command="{Binding ClearPlayListCommand}"></MenuItem>
                     <MenuItem Header="Delete Permanently" Click="DeletePermanently_Click"></MenuItem>
                 </ContextMenu>
             </ListBox.ContextMenu>

@@ -11,7 +11,7 @@ namespace MusicPlayer2
     /// </summary>
     public partial class FindMusic : MetroWindow
     {
-        public FindMusic(PlayList playList)
+        public FindMusic(PlayerViewModel playList)
         {
             InitializeComponent();
             this.playList = playList;
@@ -21,7 +21,7 @@ namespace MusicPlayer2
 
         #region Props
 
-        private PlayList playList { get; set; }
+        private PlayerViewModel playList { get; set; }
 
         public ReturnKind ReturnKind { get; private set; }
 

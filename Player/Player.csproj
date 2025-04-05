@@ -113,11 +113,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="RelayCommand.cs" />
+    <Compile Include="WindowTests.xaml.cs">
+      <DependentUpon>WindowTests.xaml</DependentUpon>
+    </Compile>
     <Page Include="FindMusic.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MainWindow.xaml">
+    <Page Include="Player.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -131,15 +135,18 @@
       <DependentUpon>FindMusic.xaml</DependentUpon>
     </Compile>
     <Compile Include="IInvokeProvider.cs" />
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
+    <Compile Include="Player.xaml.cs">
+      <DependentUpon>Player.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="WindowTests.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Music.cs" />
-    <Compile Include="MusicList.cs" />
-    <Compile Include="PlayList.cs" />
+    <Compile Include="PlayerViewModel.cs" />
     <Compile Include="PlayListFileStorage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

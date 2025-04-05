@@ -13,12 +13,9 @@ using System.Threading.Tasks;
 
 namespace MusicPlayer2
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : MetroWindow
+    public partial class Player : MetroWindow
     {
-        public MainWindow()
+        public Player()
         {
             InitializeComponent();
         }
@@ -27,8 +24,11 @@ namespace MusicPlayer2
         
         private string labelTextMusicName;
         private DispatcherTimer timerMoveSlider;
-        private PlayList playList;
 
+        #endregion
+
+        #region Props
+        public PlayerViewModel PlayerViewModel => (DataContext as PlayerViewModel);
         #endregion
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -37,12 +37,23 @@ namespace MusicPlayer2
             mediaElement.UnloadedBehavior = MediaState.Manual;
             labelTextMusicName = textMusicName.Text;
             timerMoveSlider = new DispatcherTimer();
-            playList = new PlayList(mediaElement, listBoxMusics, btnPauseContinue, btnRunBack, btnRunForward, timerMoveSlider, sliderPositionOfMusic, textMusicName);
-
+            
             timerMoveSlider.Interval = TimeSpan.FromSeconds(1);
             timerMoveSlider.Tick += new EventHandler(timer_Tick);
 
-            playList.Stop2();
+            PlayerViewModel.MediaElement = mediaElement;
+            PlayerViewModel.ListBoxMusics = listBoxMusics;
+            PlayerViewModel.TxtCurrentMusicName = textMusicName;
+            PlayerViewModel.BtnPauseContinue = btnPauseContinue;
+            PlayerViewModel.BtnRunBack = btnRunBack;
+            PlayerViewModel.BtnRunForward = btnRunForward;
+            PlayerViewModel.TimerMoveSlider = timerMoveSlider;
+            PlayerViewModel.SliderPositionOfMusic = sliderPositionOfMusic;
+
+            if (listBoxMusics.SelectedIndex == -1)
+                listBoxMusics.SelectedIndex = 0;
+
+            PlayerViewModel.Stop();
         }
 
         #region timmer       
@@ -61,36 +72,7 @@ namespace MusicPlayer2
         #endregion
    
         #region click and keypress
-
-        private void BtnPlay_Click(object sender, RoutedEventArgs e)
-        {
-            playList.Play2(true);
-        }               
-
-        private void BtnPauseContinue_Click(object sender, RoutedEventArgs e)
-        {
-            playList.PauseContinue2();
-        }
-
-        private void BtnRunBack_Click(object sender, RoutedEventArgs e)
-        {
-            mediaElement.Position = mediaElement.Position - TimeSpan.FromSeconds(5);
-        }
-
-        private void BtnRunForward_Click(object sender, RoutedEventArgs e)
-        {
-            mediaElement.Position = mediaElement.Position + TimeSpan.FromSeconds(5);
-        }
-
-        private void BtnForward_Click(object sender, RoutedEventArgs e)
-        {
-            playList.PlayNextMusic2();
-        }
-
-        private void BtnPrevious_Click(object sender, RoutedEventArgs e)
-        {
-            playList.PlayPreviousMusic2();
-        }
+           
 
         private void Mute_Click(object sender, RoutedEventArgs e)
         {
@@ -100,40 +82,31 @@ namespace MusicPlayer2
         private void ListMusics_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left)
-                playList.Play2(true);
+                PlayerViewModel.Play(/*true*/);
         }
 
         private void ListMusics_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
-                playList.Play2(true);
-        }
-
-        private void CleanPlaylist_Click(object sender, RoutedEventArgs e)
-        {
-            playList.ClearPlayList();
-        }       
-
-        private void BtnAddFolder_Click(object sender, RoutedEventArgs e)
-        {
-            playList.AddFolder();
-        }
-
-        private void BtnAddFiles_Click(object sender, RoutedEventArgs e)
-        {
-            playList.AddFiles();
-        }
+                PlayerViewModel.Play(/*true*/);
+        }  
 
         private void BtnFind_Click(object sender, RoutedEventArgs e)
         {
-            var find = new FindMusic(playList);
-            find.ShowDialog();
+            //var find = new FindMusic(PlayerViewModel);
+            //find.ShowDialog();
             /*if (find.ReturnKind == ReturnKind.rkMusic)
                 playList.PlayCurrentMusic();
             else if (find.ReturnKind == ReturnKind.rkFilter)
             {
                 playList.PlayCurrentMusic();
             }*/
+        }
+
+
+        private void btnTests_Click(object sender, RoutedEventArgs e)
+        {
+            new WindowTests().ShowDialog();
         }
 
         private void SliderPositionOfMusic_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -167,25 +140,25 @@ namespace MusicPlayer2
             switch (e.Key)
             {
                 case Key.X:
-                    PressButton(btnPlay, e);
+                    PlayerViewModel.PlayCommand.Execute(null);
                     break;
                 case Key.C:
-                    PressButton(btnPauseContinue, e);
+                    PlayerViewModel.PauseContinueCommand.Execute(null);
                     break;
                 case Key.Space:
-                    PressButton(btnPauseContinue, e);
+                    PlayerViewModel.PauseContinueCommand.Execute(null);
                     break;
                 case Key.Z:
-                    PressButton(btnPrevious, e);
+                    PlayerViewModel.PreviousCommand.Execute(null);
                     break;
                 case Key.V:
-                    PressButton(btnForward, e);
+                    PlayerViewModel.NextCommand.Execute(null);
                     break;
                 case Key.F:
-                    PressButton(btnAddFolder, e);
+                    PlayerViewModel.AddFolderCommand.Execute(null);
                     break;
                 case Key.A:
-                    PressButton(btnAddFiles, e);
+                    PlayerViewModel.AddFilesCommand.Execute(null);
                     break;
                 case Key.Q:
                     PressButton(btnFind, e);
@@ -203,16 +176,16 @@ namespace MusicPlayer2
             switch (e.Key)
             {
                 case Key.S:
-                    PressButton(btnRunBack, e);
+                    PlayerViewModel.RunBackCommand.Execute(null);
                     break;
                 case Key.Left:
-                    PressButton(btnRunBack, e);
+                    PlayerViewModel.RunBackCommand.Execute(null);
                     break;
                 case Key.D:
-                    PressButton(btnRunForward, e);
+                    PlayerViewModel.RunForwardCommand.Execute(null);
                     break;
                 case Key.Right:
-                    PressButton(btnRunForward, e);
+                    PlayerViewModel.RunForwardCommand.Execute(null);
                     break;
                 default:
                     break;
@@ -262,13 +235,13 @@ namespace MusicPlayer2
         private void MediaElement_MediaEnded(object sender, RoutedEventArgs e)
         {
             timerMoveSlider.Stop();
-            playList.PlayNextMusic2();
+            PlayerViewModel.PlayNext();
         }
 
         private void MediaElement_MediaFailed(object sender, ExceptionRoutedEventArgs e)
         {
             timerMoveSlider.Stop();
-            playList.PlayNextMusic2();
+            PlayerViewModel.PlayNext();
         }
 
         #endregion
@@ -278,7 +251,6 @@ namespace MusicPlayer2
             e.Handled = true;
             btn.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Button.ClickEvent));
         }
-
 
     }
 }
