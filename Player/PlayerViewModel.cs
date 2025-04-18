@@ -19,7 +19,7 @@ namespace MusicPlayer2
         {
             this.playListFileStorage = new PlayListFileStorage();
             playListFileStorage.Load();
-            LoadToListBoxMusics(playListFileStorage.Files, 0, false, false);
+            LoadToListBoxMusics(playListFileStorage.MusicFiles, 0, false, false);
             PlayCommand = new RelayCommand(Play);
             StopCommand = new RelayCommand(Stop);
             PauseContinueCommand = new RelayCommand(PauseContinue);
@@ -29,6 +29,7 @@ namespace MusicPlayer2
             NextCommand = new RelayCommand(PlayNext);
             AddFolderCommand = new RelayCommand(AddFolder);
             AddFilesCommand = new RelayCommand(AddFiles);
+            ShowFinderFilterWindowCommand = new RelayCommand(ShowFinderFilterWindow);
             ClearPlayListCommand = new RelayCommand(ClearPlayList);
         }
 
@@ -42,6 +43,7 @@ namespace MusicPlayer2
         public ICommand NextCommand { get; }
         public ICommand AddFolderCommand { get; }
         public ICommand AddFilesCommand { get; }
+        public ICommand ShowFinderFilterWindowCommand { get; }
         public ICommand ClearPlayListCommand { get; }
 
         #endregion
@@ -49,9 +51,27 @@ namespace MusicPlayer2
         #region Props
 
         private PlayListFileStorage playListFileStorage { get; set; }
+        private List<Music> foundPlayList { get; set; }        
+        public MediaElement MediaElement { get; set; }
+        public ListBox ListBoxMusics { get; set; }
+        public Button BtnPauseContinue { get; set; }        
+        public Slider SliderPositionOfMusic { get; set; }
+        public ObservableCollection<Music> MusicsList { get; set; } = new ObservableCollection<Music>();
+
+        //
+        private bool _isPlaying { get; set; }
+        public bool IsPlaying
+        {
+            get { return _isPlaying; }
+            set { _isPlaying = value; OnPropertyChanged(); }
+        }
         //
         private Music _currentMusic;
-        private Music CurrentMusic { get => _currentMusic; set { _currentMusic = value; CurrentMusicName = value?.Name ?? ""; } }
+        public Music CurrentMusic 
+        { 
+            get => _currentMusic; 
+            set { _currentMusic = value; CurrentMusicName = (value == null) ? "" : value.Nro.ToString() + " - " + value.Name; } 
+        }
         //
         private string _currentMusicName;
         public string CurrentMusicName
@@ -60,24 +80,32 @@ namespace MusicPlayer2
             set { _currentMusicName = value; OnPropertyChanged(); }
         }
         //
-        public TextBlock TxtCurrentMusicName { get; set; }
-        private bool _isPlaying { get; set; }
-        private List<Music> foundPlayList { get; set; }
-        
-        public MediaElement MediaElement { get; set; }
-        public ListBox ListBoxMusics { get; set; }
-        public Button BtnPauseContinue { get; set; }
-        public Button BtnRunBack { get; set; }
-        public Button BtnRunForward { get; set; }
-        public DispatcherTimer TimerMoveSlider { get; set; }
-        public Slider SliderPositionOfMusic { get; set; }
-        public ObservableCollection<Music> MusicsList { get; set; } = new ObservableCollection<Music>();
-
+        private bool _isMuted = false;
+        public bool IsMuted
+        {
+            get { return _isMuted; }
+            set { _isMuted = value; MediaElement.IsMuted = value; OnPropertyChanged(); }
+        }
+        //
+        private double _volumeSlider = 1;
+        public double VolumeSlider
+        {
+            get { return _volumeSlider; }
+            set { _volumeSlider = value; MediaElement.Volume = value; OnPropertyChanged(); }
+        }
+        //
+        private double _balanceSlider = 0;
+        public double BalanceSlider
+        {
+            get { return _balanceSlider; }
+            set { _balanceSlider = value; MediaElement.Balance = value; OnPropertyChanged(); }
+        }
+        //
 
         #endregion
 
         #region Others
-        
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -92,10 +120,10 @@ namespace MusicPlayer2
             var fd = new System.Windows.Forms.FolderBrowserDialog();
             if (fd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                int last = playListFileStorage.Files.Count;
+                int last = playListFileStorage.MusicFiles.Count;
 
                 playListFileStorage.GetMusicRecursive(fd.SelectedPath);
-                LoadToListBoxMusics(playListFileStorage.Files, last, false, false);
+                LoadToListBoxMusics(playListFileStorage.MusicFiles, last, false, false);
                 playListFileStorage.Save();
             }
         }
@@ -108,9 +136,9 @@ namespace MusicPlayer2
 
             if (od.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                int last = playListFileStorage.Files.Count;
+                int last = playListFileStorage.MusicFiles.Count;
                 playListFileStorage.AddFiles(od.FileNames);
-                LoadToListBoxMusics(playListFileStorage.Files, last, false, false);
+                LoadToListBoxMusics(playListFileStorage.MusicFiles, last, false, false);
                 playListFileStorage.Save();
             }
         }
@@ -134,6 +162,18 @@ namespace MusicPlayer2
             
         }
 
+        public void ShowFinderFilterWindow()
+        {
+            var find = new FindMusic(this);
+            find.ShowDialog();
+            /*if (find.ReturnKind == ReturnKind.rkMusic)
+                playList.PlayCurrentMusic();
+            else if (find.ReturnKind == ReturnKind.rkFilter)
+            {
+                playList.PlayCurrentMusic();
+            }*/
+        }
+
 
         public void Filter(System.Windows.Controls.ListBox listBox, string filterText)
         {
@@ -143,7 +183,7 @@ namespace MusicPlayer2
                 keys = keys.Where(c => c.Trim() != "").ToArray();
                 string chaves = keys.Aggregate((i, j) => i + "|" + j);
 
-                foundPlayList = playListFileStorage.Files.Where(c => Regex.Match(c.NameForSearch, chaves).Success).ToList();
+                foundPlayList = playListFileStorage.MusicFiles.Where(c => Regex.Match(c.NameForSearch, chaves).Success).ToList();
                 listBox.Items.Clear();
                 LoadToListBoxMusics(foundPlayList, 0, true, true);
             }
@@ -155,22 +195,36 @@ namespace MusicPlayer2
 
         public void DeletePermanently(Music music)
         {
-            if (music == CurrentMusic)
-                //SetIsPlaying(false);
+            if ((music == CurrentMusic) && (IsPlaying))
+                PlayNext();
 
+            string error = string.Empty;
+            try
+            {
                 File.Delete(music.Path);
-            playListFileStorage.Files.Remove(music);
-            ListBoxMusics.Items.Remove(music.ItemOnListBox);
-            playListFileStorage.Save();
-            CurrentMusic = null;
+            }
+            catch (Exception ex)
+            {
+                error = ex.Message;
+            }
+
+            if (error == string.Empty)
+            {
+                playListFileStorage.MusicFiles.Remove(music);
+                MusicsList.Remove(music);
+                playListFileStorage.Save();
+            }
 
         }
 
-        ////////////////////////////////
-        ////////////////////////////////
+        //
+        //
 
         public void Play()
         {
+            if ((ListBoxMusics.SelectedItem == null) && (ListBoxMusics.Items.Count > 0))
+                ListBoxMusics.SelectedIndex = 0;
+
             if (ListBoxMusics.SelectedItem != null)
                 CurrentMusic = ListBoxMusics.SelectedItem as Music;
 
@@ -183,20 +237,16 @@ namespace MusicPlayer2
             {
                 MediaElement.Source = new Uri(CurrentMusic.Path);
                 MediaElement.Play();
-                _isPlaying = true;
-                ListBoxMusics.SelectedIndex = ListBoxMusics.Items.IndexOf(CurrentMusic.ItemOnListBox);
+                IsPlaying = true;
+                ListBoxMusics.SelectedIndex = ListBoxMusics.Items.IndexOf(CurrentMusic);
                 ListBoxMusics.ScrollIntoView(ListBoxMusics.SelectedItem);
-                RefreshControlsStatus(false);
 
             }
-            else
-                RefreshControlsStatus(true);
         }
-
 
         public void PauseContinue()
         {
-            if (_isPlaying)
+            if (IsPlaying)
             {
                 if (BtnPauseContinue.Content.ToString() == "Pause")
                 {
@@ -263,28 +313,12 @@ namespace MusicPlayer2
             PlayCurrentMusic();
         }
 
-
-        public void RefreshControlsStatus(bool isStoped)
-        {
-            BtnPauseContinue.IsEnabled = !isStoped;
-            BtnRunBack.IsEnabled = !isStoped;
-            BtnRunForward.IsEnabled = !isStoped;
-            TimerMoveSlider.IsEnabled = !isStoped;
-
-            if (isStoped)
-                SliderPositionOfMusic.Value = 0;
-
-        }
-
         public void Stop()
         {
             MediaElement.Stop();
             CurrentMusic = null;
-            _isPlaying = false;
-            RefreshControlsStatus(true);
+            IsPlaying = false;
+            SliderPositionOfMusic.Value = 0;
         }
-
-        
-
     }
 }

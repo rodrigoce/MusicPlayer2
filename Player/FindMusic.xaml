@@ -9,7 +9,7 @@
         Title="Find / Filter Musics" Height="450" Width="800" Icon="icon.ico" PreviewKeyUp="Window_PreviewKeyUp" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="30" />
+            <RowDefinition Height="50" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 

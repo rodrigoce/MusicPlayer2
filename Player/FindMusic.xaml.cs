@@ -11,17 +11,17 @@ namespace MusicPlayer2
     /// </summary>
     public partial class FindMusic : MetroWindow
     {
-        public FindMusic(PlayerViewModel playList)
+        public FindMusic(PlayerViewModel playerViewModel)
         {
             InitializeComponent();
-            this.playList = playList;
+            this.PlayerViewModel = playerViewModel;
             ReturnKind = ReturnKind.rkNone;
             textFind.Focus();
         }
 
         #region Props
 
-        private PlayerViewModel playList { get; set; }
+        private PlayerViewModel PlayerViewModel { get; set; }
 
         public ReturnKind ReturnKind { get; private set; }
 
@@ -57,7 +57,7 @@ namespace MusicPlayer2
 
         private void TextFind_TextChanged(object sender, TextChangedEventArgs e)
         {
-            playList.Filter(listBoxMusics, textFind.Text);
+            PlayerViewModel.Filter(listBoxMusics, textFind.Text);
         }
                 
         private void ListMusics_PreviewKeyDown(object sender, KeyEventArgs e)
