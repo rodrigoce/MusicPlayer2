@@ -22,7 +22,34 @@
         <!-- Line 0 -->
         <Rectangle Fill="Black" />
         <MediaElement x:Name="mediaElement" IsManipulationEnabled="True" MediaOpened="MediaElement_MediaOpened" ForceCursor="True" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="60" Height="30" MediaEnded="MediaElement_MediaEnded" MediaFailed="MediaElement_MediaFailed" />
-        <TextBlock x:Name="textMusicName" HorizontalAlignment="Center" TextWrapping="Wrap" Text="{Binding CurrentMusicName, Mode=OneWay}" VerticalAlignment="Center" FontSize="16" Foreground="White" FontWeight="Bold" />
+        <TextBlock x:Name="textMusicName" HorizontalAlignment="Center" TextWrapping="Wrap" Text="{Binding CurrentMusicName, Mode=OneWay, NotifyOnTargetUpdated=True}" VerticalAlignment="Center" FontSize="16" Foreground="White" FontWeight="Bold">
+           <TextBlock.Triggers>
+               <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                   <BeginStoryboard>
+                       <Storyboard>
+                           <DoubleAnimation
+                               Storyboard.TargetProperty="(TextBlock.Opacity)"
+                               From="1"
+                               To="0.3"
+                               Duration="0:0:0.3" 
+                               AutoReverse="True" />
+                       </Storyboard>
+                   </BeginStoryboard>
+                   <BeginStoryboard>
+                       <Storyboard>
+                           <ColorAnimation
+                               Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                               To="Red"
+                               Duration="0:0:2.0" />
+                            <ColorAnimation
+                                Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                To="White"
+                                Duration="0:0:2.0" />
+                        </Storyboard>
+                   </BeginStoryboard>
+               </EventTrigger>
+           </TextBlock.Triggers>
+        </TextBlock>
 
         <!-- Line 1 -->
         <Slider x:Name="sliderPositionOfMusic" Value="0" VerticalAlignment="Center" Grid.Row="1" PreviewMouseLeftButtonUp="SliderPositionOfMusic_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="SliderPositionOfMusic_PreviewMouseLeftButtonDown"/>

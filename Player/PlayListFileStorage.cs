@@ -44,9 +44,9 @@ namespace MusicPlayer2
             var sl = new List<string>();
             foreach (var item in MusicFiles)
             {
-                sl.Add(item.Name + Constantes.RECORD_SEPARATOR +
-                    item.NameForSearch + Constantes.RECORD_SEPARATOR +
-                    item.Path + Constantes.RECORD_SEPARATOR + 
+                sl.Add(item.Name + Constants.RECORD_SEPARATOR +
+                    item.NameForSearch + Constants.RECORD_SEPARATOR +
+                    item.Path + Constants.RECORD_SEPARATOR + 
                     item.Visible.ToString());
             } 
 
@@ -55,7 +55,7 @@ namespace MusicPlayer2
 
         public void Save()
         {
-            File.WriteAllLines(Path.GetTempPath() + Constantes.STORE_FILENAME, ListToLines());
+            File.WriteAllLines(Path.GetTempPath() + Constants.PLAYLIST_FILENAME, ListToLines());
         }
 
         public void Load()
@@ -66,7 +66,7 @@ namespace MusicPlayer2
 
             try
             {
-                f = File.ReadAllLines(Path.GetTempPath() + Constantes.STORE_FILENAME);
+                f = File.ReadAllLines(Path.GetTempPath() + Constants.PLAYLIST_FILENAME);
             }
             catch 
             {
@@ -77,7 +77,7 @@ namespace MusicPlayer2
             {
                 foreach (var item in f)
                 {
-                    var separated = item.Split(Constantes.RECORD_SEPARATOR);
+                    var separated = item.Split(Constants.RECORD_SEPARATOR);
                     MusicFiles.Add(new Music()
                     {
                         Nro = MusicFiles.Count + 1,

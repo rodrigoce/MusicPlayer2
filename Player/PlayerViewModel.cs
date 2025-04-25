@@ -14,7 +14,8 @@ namespace MusicPlayer2
     {
         public PlayerViewModel() 
         {
-            this.PlayListFileStorage = new PlayListFileStorage();
+            PlayerControlsFileStorage = new PlayerControlsFileStorage();            
+            PlayListFileStorage = new PlayListFileStorage();
             PlayListFileStorage.Load();
             LoadToObservableCollection(PlayListFileStorage.MusicFiles, MusicsList, 0);
             FilteredMusicsList = CollectionViewSource.GetDefaultView(MusicsList) as ListCollectionView;
@@ -48,6 +49,7 @@ namespace MusicPlayer2
 
         #region Props
 
+        public PlayerControlsFileStorage PlayerControlsFileStorage { get; private set; }
         public PlayListFileStorage PlayListFileStorage { get; set; }
         public MediaElement MediaElement { get; set; }
         public ListBox ListBoxMusics { get; set; }
@@ -108,7 +110,15 @@ namespace MusicPlayer2
         public double VolumeSlider
         {
             get { return _volumeSlider; }
-            set { _volumeSlider = value; MediaElement.Volume = value; OnPropertyChanged(); }
+            set 
+            { 
+                if (_volumeSlider == value) return;
+
+                _volumeSlider = value; 
+                MediaElement.Volume = value; 
+                PlayerControlsFileStorage.SaveValue(Constants.VOLUME_SLIDER, value.ToString()); 
+                OnPropertyChanged(); 
+            }
         }
         //
         private double _balanceSlider = 0;
@@ -130,6 +140,11 @@ namespace MusicPlayer2
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
         
+        public void LoadControlsValuesFromFile()
+        {
+            VolumeSlider = PlayerControlsFileStorage.LoadDouble(Constants.VOLUME_SLIDER) ?? 1;
+        }
+
         #endregion
 
         public void AddFolder()

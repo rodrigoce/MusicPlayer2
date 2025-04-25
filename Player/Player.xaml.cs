@@ -39,6 +39,8 @@ namespace MusicPlayer2
             PlayerViewModel.ListBoxMusics = listBoxMusics;
             PlayerViewModel.BtnPauseContinue = btnPauseContinue;
             PlayerViewModel.SliderPositionOfMusic = sliderPositionOfMusic;
+
+            PlayerViewModel.LoadControlsValuesFromFile();
         }
 
         #region timmer       

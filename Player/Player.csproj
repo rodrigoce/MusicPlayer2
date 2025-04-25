@@ -15,7 +15,8 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <PublishUrl>d:\teste\</PublishUrl>
+    <TargetFrameworkProfile />
+    <PublishUrl>C:\Users\rceleoterio\Documents\MusicPlayer2\Publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
     <UpdateEnabled>false</UpdateEnabled>
@@ -25,12 +26,11 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>5</ApplicationRevision>
+    <ApplicationRevision>7</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -115,6 +115,7 @@
     </ApplicationDefinition>
     <Compile Include="FindFilterMusicViewModel.cs" />
     <Compile Include="PhoneticAlgorithmBR.cs" />
+    <Compile Include="PlayerControlsFileStorage.cs" />
     <Compile Include="RelayCommand.cs" />
     <Page Include="FindFilterMusics.xaml">
       <SubType>Designer</SubType>
@@ -128,7 +129,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Constantes.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="FindFilterMusics.xaml.cs">
       <DependentUpon>FindFilterMusics.xaml</DependentUpon>
