@@ -151,7 +151,6 @@ namespace MusicPlayer2
             await AskDeletePermanently();
         }
 
-        [Obsolete("apagar também da lista filtrada se houver e vice versa")]
         private async Task AskDeletePermanently()
         {
             if (listBoxMusics.SelectedItem == null) return;

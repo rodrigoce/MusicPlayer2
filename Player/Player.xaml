@@ -60,55 +60,11 @@
             <Button x:Name="btnAddFolder" Content="Add Folder" Command="{Binding AddFolderCommand}" ToolTip="8" Margin="10,0" VerticalAlignment="Center"/>
             <Button x:Name="btnAddFiles" Content="Add Files" Command="{Binding AddFilesCommand}" ToolTip="9" Margin="0,0" VerticalAlignment="Center"/>
             <Button x:Name="btnFind" Content="Find/Filter" Command="{Binding ShowFinderFilterWindowCommand}" ToolTip="0" Margin="10,0" VerticalAlignment="Center"/>
-            <!--<Button x:Name="btnKeyMap" Content="Key Map" Margin="10,0" VerticalAlignment="Center">
-                <Button.ToolTip>
-                    <ToolTip>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" Grid.Column="0" Text="x" FontWeight="Bold" Margin="0,0,10,0"/>
-                            <TextBlock Grid.Row="0" Grid.Column="1" Text="Play"/>
-                            <TextBlock Grid.Row="1" Grid.Column="0" Text="c/space" FontWeight="Bold" Margin="0,0,10,0"/>
-                            <TextBlock Grid.Row="1" Grid.Column="1" Text="Pause/Continue"/>
-                            <TextBlock Grid.Row="2" Grid.Column="0" Text="s/left" FontWeight="Bold" Margin="0,0,10,0"/>
-                            <TextBlock Grid.Row="2" Grid.Column="1" Text="run back"/>
-                            <TextBlock Grid.Row="3" Grid.Column="0" Text="d/right" FontWeight="Bold" Margin="0,0,10,0"/>
-                            <TextBlock Grid.Row="3" Grid.Column="1" Text="run forward"/>
-                            <TextBlock Grid.Row="4" Grid.Column="0" Text="z" FontWeight="Bold" Margin="0,0,10,0"/>
-                            <TextBlock Grid.Row="4" Grid.Column="1" Text="previous"/>
-                            <TextBlock Grid.Row="5" Grid.Column="0" Text="v" FontWeight="Bold" Margin="0,0,10,0"/>
-                            <TextBlock Grid.Row="5" Grid.Column="1" Text="next"/>
-                            <TextBlock Grid.Row="6" Grid.Column="0" Text="f" FontWeight="Bold" Margin="0,0,10,0"/>
-                            <TextBlock Grid.Row="6" Grid.Column="1" Text="add folder"/>
-                            <TextBlock Grid.Row="7" Grid.Column="0" Text="a" FontWeight="Bold" Margin="0,0,10,0"/>
-                            <TextBlock Grid.Row="7" Grid.Column="1" Text="add files"/>
-                            <TextBlock Grid.Row="8" Grid.Column="0" Text="q" FontWeight="Bold" Margin="0,0,10,0"/>
-                            <TextBlock Grid.Row="8" Grid.Column="1" Text="find"/>
-                            <TextBlock Grid.Row="9" Grid.Column="0" Text="delete" FontWeight="Bold" Margin="0,0,10,0"/>
-                            <TextBlock Grid.Row="9" Grid.Column="1" Text="delete file permanently"/>
-                        </Grid>
-                    </ToolTip>
-                </Button.ToolTip>
-            </Button>-->
         </StackPanel>
 
         <!-- Line 4 -->
         <ListBox x:Name="listBoxMusics" Margin="0" Grid.Row="4" PreviewMouseDoubleClick="ListMusics_PreviewMouseDoubleClick" FontSize="14" 
-                 PreviewKeyDown="ListMusics_PreviewKeyDown" AlternationCount="2" ItemsSource="{Binding MusicsList}">
+                 PreviewKeyDown="ListMusics_PreviewKeyDown" AlternationCount="2" ItemsSource="{Binding FilteredMusicsList}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal" Margin="5">

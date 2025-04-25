@@ -47,7 +47,7 @@ namespace MusicPlayer2
                 sl.Add(item.Name + Constantes.RECORD_SEPARATOR +
                     item.NameForSearch + Constantes.RECORD_SEPARATOR +
                     item.Path + Constantes.RECORD_SEPARATOR + 
-                    item.IsInFilter.ToString());
+                    item.Visible.ToString());
             } 
 
             return sl;
@@ -84,7 +84,7 @@ namespace MusicPlayer2
                         Name = separated[0],
                         NameForSearch = separated[1],
                         Path = separated[2],
-                        IsInFilter = bool.Parse(separated[3])
+                        Visible = true//bool.Parse(separated[3])
                     });
                 }
             }

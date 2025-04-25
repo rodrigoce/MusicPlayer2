@@ -113,8 +113,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="FindFilterMusicViewModel.cs" />
+    <Compile Include="PhoneticAlgorithmBR.cs" />
     <Compile Include="RelayCommand.cs" />
-    <Page Include="FindMusic.xaml">
+    <Page Include="FindFilterMusics.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -128,8 +130,8 @@
     </Compile>
     <Compile Include="Constantes.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="FindMusic.xaml.cs">
-      <DependentUpon>FindMusic.xaml</DependentUpon>
+    <Compile Include="FindFilterMusics.xaml.cs">
+      <DependentUpon>FindFilterMusics.xaml</DependentUpon>
     </Compile>
     <Compile Include="IInvokeProvider.cs" />
     <Compile Include="Player.xaml.cs">
